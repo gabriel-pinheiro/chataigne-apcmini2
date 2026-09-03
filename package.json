@@ -8,12 +8,15 @@
   },
   "scripts": {
     "generate": "tsx scripts/generate-module.ts",
-    "typecheck": "tsc --noEmit",
+    "build:runtime": "tsx scripts/build-runtime.ts",
+    "build": "npm run generate && npm run build:runtime",
+    "typecheck": "tsc --noEmit && tsc -p src/tsconfig.json",
     "test:unit": "tsx --test scripts/test/*.test.ts",
-    "test": "npm run typecheck && npm run test:unit"
+    "test": "npm run typecheck && npm run build:runtime && npm run test:unit"
   },
   "devDependencies": {
     "@types/node": "^26.4.1",
+    "esbuild": "^0.28.2",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2"
   }

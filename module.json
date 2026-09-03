@@ -7,6 +7,9 @@
   "hasInput": true,
   "hasOutput": true,
   "hideDefaultCommands": true,
+  "scripts": [
+    "runtime/apc-mini-mkii.js"
+  ],
   "defaults": {
     "devices": [
       "APC mini mk2 Control",
@@ -4305,6 +4308,23 @@
     }
   },
   "values": {
+    "Status": {
+      "type": "Container",
+      "collapsed": true,
+      "Pad Mode": {
+        "type": "Enum",
+        "shortName": "padMode",
+        "default": "Unknown",
+        "options": {
+          "Unknown": "unknown",
+          "Session": "session",
+          "Note": "note",
+          "Drum": "drum"
+        },
+        "readOnly": true,
+        "description": "Currently detected hardware pad mode. Only Session Mode is supported."
+      }
+    },
     "Pads": {
       "type": "Container",
       "collapsed": false,

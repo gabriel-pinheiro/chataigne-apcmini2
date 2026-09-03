@@ -15,6 +15,7 @@ import {
   padValues
 } from "../lib/pads.js";
 import type { JsonValue } from "../lib/schema.js";
+import { statusValues } from "../lib/status.js";
 
 const metadataKeys = new Set(["type", "collapsed"]);
 
@@ -59,6 +60,22 @@ test("builds track, scene, shift, and fader controls", () => {
   assert.ok("Shift" in values);
   assert.equal(Object.keys(faders).length, CHANNEL_FADER_COUNT + 1);
   assert.ok("Master Fader" in faders);
+});
+
+test("exposes a stable read-only pad mode status", () => {
+  const status = statusValues();
+  const padMode = status["Pad Mode"];
+
+  assert.ok(padMode !== null && !Array.isArray(padMode) && typeof padMode === "object");
+  assert.equal(padMode.shortName, "padMode");
+  assert.equal(padMode.default, "Unknown");
+  assert.equal(padMode.readOnly, true);
+  assert.deepEqual(padMode.options, {
+    Unknown: "unknown",
+    Session: "session",
+    Note: "note",
+    Drum: "drum"
+  });
 });
 
 test("initializes all palette modes consistently with Exact RGB", () => {

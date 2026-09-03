@@ -2,6 +2,7 @@ import { buttonParameters, buttonValues } from "./buttons.js";
 import { faderValues } from "./faders.js";
 import { padParameters, padValues } from "./pads.js";
 import { container, type Definition } from "./schema.js";
+import { statusValues } from "./status.js";
 
 export const moduleDefinition: Definition = {
   name: "APC Mini mkII Enhanced",
@@ -12,6 +13,7 @@ export const moduleDefinition: Definition = {
   hasInput: true,
   hasOutput: true,
   hideDefaultCommands: true,
+  scripts: ["runtime/apc-mini-mkii.js"],
   defaults: {
     devices: ["APC mini mk2 Control", "APC mini mk2 Control"],
     autoAdd: false
@@ -54,6 +56,7 @@ export const moduleDefinition: Definition = {
     Buttons: container(buttonParameters())
   },
   values: {
+    Status: statusValues(),
     Pads: container(padValues(), false),
     Buttons: container(buttonValues()),
     Faders: container(faderValues())

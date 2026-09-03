@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2015",
+    "module": "CommonJS",
+    "strict": true,
+    "skipLibCheck": true,
+    "types": [],
+    "noEmit": true
+  },
+  "files": [
+    "chataigne.d.ts",
+    "lib/protocol.ts",
+    "lib/controls.ts",
+    "lib/mode.ts",
+    "lib/connection.ts",
+    "apc-mini-mkii.ts"
+  ]
+}
