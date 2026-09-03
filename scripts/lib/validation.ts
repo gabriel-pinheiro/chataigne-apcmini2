@@ -25,3 +25,20 @@ export function validateEnumDefaults(value: JsonValue, path: string[] = []): voi
     validateEnumDefaults(child, [...path, key]);
   }
 }
+
+export function validateLeafShortNames(value: JsonValue, path: string[] = []): void {
+  if (Array.isArray(value) || value === null || typeof value !== "object") {
+    return;
+  }
+
+  if (typeof value.type === "string" && value.type !== "Container") {
+    if (typeof value.shortName !== "string" || value.shortName.length === 0) {
+      throw new TypeError(`Controllable at ${path.join(" > ")} needs a shortName.`);
+    }
+    return;
+  }
+
+  for (const [key, child] of Object.entries(value)) {
+    validateLeafShortNames(child, [...path, key]);
+  }
+}
