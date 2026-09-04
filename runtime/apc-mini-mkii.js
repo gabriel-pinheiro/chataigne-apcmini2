@@ -264,6 +264,152 @@ function resetPressedValues() {
   }
   setButtonPressed(shiftButtonNote, false);
 }
+var interpretedInputLogControl;
+var interpretedOutputLogControl;
+var sendClockControl;
+var bpmControl;
+var lastLoggedFaderValues = [-1, -1, -1, -1, -1, -1, -1, -1, -1];
+function initializeLogging() {
+  interpretedInputLogControl = local.parameters.logging.logInterpretedInput;
+  interpretedOutputLogControl = local.parameters.logging.logInterpretedOutput;
+  sendClockControl = local.parameters.clock.sendClock;
+  bpmControl = local.parameters.clock.bpm;
+}
+function logPadInput(note, isPressed) {
+  if (!interpretedInputLogControl.get()) return;
+  script.log("Pad " + (isPressed ? "Pressed: " : "Released: ") + padLabel(note));
+}
+function logButtonInput(note, isPressed) {
+  if (!interpretedInputLogControl.get()) return;
+  var label = buttonLabel(note);
+  if (label == "Shift") {
+    script.log("Shift " + (isPressed ? "Pressed" : "Released"));
+    return;
+  }
+  script.log("Button " + (isPressed ? "Pressed: " : "Released: ") + label);
+}
+function logFaderInput(index, value) {
+  if (!interpretedInputLogControl.get()) return;
+  if (lastLoggedFaderValues[index] == value) return;
+  lastLoggedFaderValues[index] = value;
+  script.log("Fader Changed: " + faderLabel(index) + " = " + formatMidiValue(value));
+}
+function logDrumPadInput(pitch, isPressed) {
+  if (!interpretedInputLogControl.get()) return;
+  script.log(
+    "Unsupported Drum Pad " + (isPressed ? "Pressed" : "Released") + ": note " + pitch
+  );
+}
+function logPadModeInput(mode) {
+  if (!interpretedInputLogControl.get()) return;
+  script.log("Pad Mode Changed: " + padModeLabel(mode));
+}
+function logUnrecognizedNoteInput(eventName, channel, pitch, velocity) {
+  if (!interpretedInputLogControl.get()) return;
+  script.log(
+    "Unrecognized Input: " + eventName + ", channel " + channel + ", note " + pitch + ", velocity " + velocity
+  );
+}
+function logUnrecognizedCcInput(channel, number, value) {
+  if (!interpretedInputLogControl.get()) return;
+  script.log(
+    "Unrecognized Input: Control Change, channel " + channel + ", CC " + number + ", value " + value
+  );
+}
+function logUnrecognizedSysexInput(data) {
+  if (!interpretedInputLogControl.get()) return;
+  var messageId = data.length > 3 ? data[3] : -1;
+  script.log(
+    "Unrecognized Input: SysEx, " + data.length + " bytes, message ID " + messageId
+  );
+}
+function logInvalidIntroductionResponse(byteCount) {
+  if (!interpretedInputLogControl.get()) return;
+  script.log("Initialization Response Invalid: " + byteCount + " payload bytes");
+}
+function logAmbiguousIntroductionResponse(willRetry) {
+  if (!interpretedInputLogControl.get()) return;
+  if (willRetry) {
+    script.log("Initialization Response: all faders returned 127; retrying");
+  } else {
+    script.log("Initialization Response: all faders returned 127; keeping last known values");
+  }
+}
+function logSuccessfulIntroductionResponse(values) {
+  if (!interpretedInputLogControl.get()) return;
+  var message = "Initialization Complete: ";
+  for (var index = 0; index < values.length; index += 1) {
+    if (index > 0) message += ", ";
+    message += faderLabel(index) + " = " + formatMidiValue(values[index]);
+  }
+  script.log(message);
+}
+function logInitializationRequest(attempt) {
+  if (!interpretedOutputLogControl.get()) return;
+  script.log("Initialization Request Sent: attempt " + attempt);
+}
+function handleLoggingParameterChange(parameter) {
+  if (parameter.is(interpretedInputLogControl)) {
+    if (interpretedInputLogControl.get()) resetFaderLogHistory();
+    return;
+  }
+  if (parameter.is(interpretedOutputLogControl)) {
+    if (interpretedOutputLogControl.get()) logCurrentClockState();
+    return;
+  }
+  if (!interpretedOutputLogControl.get()) return;
+  if (parameter.is(sendClockControl)) {
+    logCurrentClockState();
+  } else if (parameter.is(bpmControl)) {
+    script.log("MIDI Clock BPM Changed: " + bpmControl.get());
+  }
+}
+function resetFaderLogHistory() {
+  for (var index = 0; index < lastLoggedFaderValues.length; index += 1) {
+    lastLoggedFaderValues[index] = -1;
+  }
+}
+function logCurrentClockState() {
+  if (!interpretedOutputLogControl.get()) return;
+  if (sendClockControl.get()) {
+    script.log("MIDI Clock Enabled: " + bpmControl.get() + " BPM");
+  } else {
+    script.log("MIDI Clock Disabled");
+  }
+}
+function padLabel(note) {
+  var row = Math.round(8 - Math.floor(note / 8));
+  var column = note % 8 + 1;
+  return row + "." + column;
+}
+function buttonLabel(note) {
+  if (note >= trackButtonNoteMinimum && note <= trackButtonNoteMaximum) {
+    return "Track " + (note - trackButtonNoteMinimum + 1);
+  }
+  if (note >= sceneButtonNoteMinimum && note <= sceneButtonNoteMaximum) {
+    return "Scene " + (note - sceneButtonNoteMinimum + 1);
+  }
+  if (note == shiftButtonNote) return "Shift";
+  return "Unknown";
+}
+function faderLabel(index) {
+  if (index == 8) return "Master Fader";
+  return "Fader " + (index + 1);
+}
+function padModeLabel(mode) {
+  if (mode == "session") return "Session";
+  if (mode == "note") return "Note";
+  if (mode == "drum") return "Drum";
+  return "Unknown";
+}
+function formatMidiValue(value) {
+  var percentageTenths = Math.round(value * 1e3 / 127);
+  var percentageWhole = Math.round(Math.floor(percentageTenths / 10));
+  var percentageFraction = percentageTenths % 10;
+  var percentage = "" + percentageWhole;
+  if (percentageFraction != 0) percentage += "." + percentageFraction;
+  return value + " (" + percentage + "%)";
+}
 var padModeControl;
 var currentPadMode = "unknown";
 function initializePadMode() {
@@ -309,9 +455,14 @@ function initializeConnection() {
 }
 function handleIntroductionResponse(data) {
   var faderValues = decodeIntroductionFaders(data);
-  if (faderValues.length != 9) return;
+  if (faderValues.length != 9) {
+    logInvalidIntroductionResponse(data.length);
+    return;
+  }
   if (isAmbiguousFaderSnapshot(faderValues)) {
-    if (introductionAttempts < maximumIntroductionAttempts) {
+    var willRetry = introductionAttempts < maximumIntroductionAttempts;
+    logAmbiguousIntroductionResponse(willRetry);
+    if (willRetry) {
       introductionState = 1;
       introductionStateChangedAt = util.getTime();
       return;
@@ -323,6 +474,7 @@ function handleIntroductionResponse(data) {
     return;
   }
   introductionState = 0;
+  logSuccessfulIntroductionResponse(faderValues);
   for (var index = 0; index < faderValues.length; index += 1) {
     setFaderPosition(index, faderValues[index]);
   }
@@ -349,6 +501,7 @@ function updateIntroduction() {
     introductionState = 2;
     introductionStateChangedAt = now;
     introductionAttempts += 1;
+    logInitializationRequest(introductionAttempts);
     sendIntroductionRequest();
     return;
   }
@@ -412,51 +565,89 @@ function sameControl(first, second) {
 function init() {
   script.enableLog.set(true);
   script.setUpdateRate(20);
+  initializeLogging();
   initializePadMode();
   initializeConnection();
+  logCurrentClockState();
 }
 function noteOnEvent(channel, pitch, velocity) {
   if (isDrumPadMessage(channel, pitch)) {
+    logDrumPadInput(pitch, velocity > 0);
     setPadMode("drum");
     return;
   }
-  if (channel != sessionMidiChannel) return;
+  if (channel != sessionMidiChannel) {
+    logUnrecognizedNoteInput("Note On", channel, pitch, velocity);
+    return;
+  }
   if (pitch >= sessionPadNoteMinimum && pitch <= sessionPadNoteMaximum) {
-    if (wrongInputDeviceSelected) return;
-    setSessionPadPressed(pitch, velocity > 0);
+    if (wrongInputDeviceSelected) {
+      logUnrecognizedNoteInput("Note On", channel, pitch, velocity);
+      return;
+    }
+    var isPressed = velocity > 0;
+    setSessionPadPressed(pitch, isPressed);
+    logPadInput(pitch, isPressed);
     setPadMode("session");
     return;
   }
-  setButtonPressed(pitch, velocity > 0);
+  var isButtonPressed = velocity > 0;
+  if (setButtonPressed(pitch, isButtonPressed)) {
+    logButtonInput(pitch, isButtonPressed);
+  } else {
+    logUnrecognizedNoteInput("Note On", channel, pitch, velocity);
+  }
 }
-function noteOffEvent(channel, pitch, _velocity) {
+function noteOffEvent(channel, pitch, velocity) {
   if (isDrumPadMessage(channel, pitch)) {
+    logDrumPadInput(pitch, false);
     setPadMode("drum");
     return;
   }
-  if (channel != sessionMidiChannel) return;
+  if (channel != sessionMidiChannel) {
+    logUnrecognizedNoteInput("Note Off", channel, pitch, velocity);
+    return;
+  }
   if (pitch >= sessionPadNoteMinimum && pitch <= sessionPadNoteMaximum) {
-    if (wrongInputDeviceSelected) return;
+    if (wrongInputDeviceSelected) {
+      logUnrecognizedNoteInput("Note Off", channel, pitch, velocity);
+      return;
+    }
     setSessionPadPressed(pitch, false);
+    logPadInput(pitch, false);
     setPadMode("session");
     return;
   }
-  setButtonPressed(pitch, false);
+  if (setButtonPressed(pitch, false)) {
+    logButtonInput(pitch, false);
+  } else {
+    logUnrecognizedNoteInput("Note Off", channel, pitch, velocity);
+  }
 }
 function ccEvent(channel, number, value) {
-  if (channel != sessionMidiChannel) return;
-  if (number < faderCcMinimum || number > faderCcMaximum) return;
-  setFaderPosition(number - faderCcMinimum, value);
+  if (channel != sessionMidiChannel || number < faderCcMinimum || number > faderCcMaximum) {
+    logUnrecognizedCcInput(channel, number, value);
+    return;
+  }
+  var faderIndex = number - faderCcMinimum;
+  setFaderPosition(faderIndex, value);
+  logFaderInput(faderIndex, value);
 }
 function sysExEvent(data) {
   var mode = decodePadMode(data);
   if (mode != "") {
     setPadMode(mode);
+    logPadModeInput(mode);
     return;
   }
-  handleIntroductionResponse(data);
+  if (isApcSysex(data, introductionResponseId)) {
+    handleIntroductionResponse(data);
+  } else {
+    logUnrecognizedSysexInput(data);
+  }
 }
 function moduleParameterChanged(parameter) {
+  handleLoggingParameterChange(parameter);
   handleModuleParameterChange(parameter);
 }
 function update(_deltaTime) {

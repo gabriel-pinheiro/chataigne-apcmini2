@@ -11,6 +11,7 @@
     "chataigne.d.ts",
     "lib/protocol.ts",
     "lib/controls.ts",
+    "lib/logging.ts",
     "lib/mode.ts",
     "lib/connection.ts",
     "apc-mini-mkii.ts"

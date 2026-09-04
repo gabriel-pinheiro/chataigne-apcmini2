@@ -52,6 +52,23 @@ export const moduleDefinition: Definition = {
       },
       false
     ),
+    Logging: container(
+      {
+        "Log Interpreted Input": {
+          type: "Boolean",
+          shortName: "logInterpretedInput",
+          default: false,
+          description: "Log concise, hardware-aware descriptions of incoming APC Mini mkII events."
+        },
+        "Log Interpreted Output": {
+          type: "Boolean",
+          shortName: "logInterpretedOutput",
+          default: false,
+          description: "Log concise, hardware-aware descriptions of outgoing APC Mini mkII operations."
+        }
+      },
+      false
+    ),
     Pads: container(padParameters(), false),
     Buttons: container(buttonParameters())
   },

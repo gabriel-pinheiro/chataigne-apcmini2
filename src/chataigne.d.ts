@@ -69,6 +69,14 @@ interface ChataigneLocal {
   parameters: {
     devices: ChataigneMidiDeviceParameter;
     isConnected: ChataigneParameter<boolean>;
+    clock: {
+      sendClock: ChataigneParameter<boolean>;
+      bpm: ChataigneParameter<number>;
+    };
+    logging: {
+      logInterpretedInput: ChataigneParameter<boolean>;
+      logInterpretedOutput: ChataigneParameter<boolean>;
+    };
   };
   values: {
     pads: ChataignePads;

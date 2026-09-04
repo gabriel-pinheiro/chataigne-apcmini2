@@ -17,6 +17,14 @@ nine current fader positions from the controller. Some controller states return
 retries once and preserves its last known values if that ambiguous response is
 repeated.
 
+### Interpreted logging
+
+`Parameters > Logging` contains opt-in `Log Interpreted Input` and
+`Log Interpreted Output` controls. These produce concise controller-aware
+messages for pads, buttons, faders, modes, initialization, and MIDI Clock
+configuration. They are independent from Chataigne's raw MIDI logging toggles.
+Operational warnings remain enabled regardless of these settings.
+
 Hardware behavior and MIDI mappings are based on Akai's
 [user guide](https://cdn.inmusicbrands.com/akai/apc-mini-mkii/APC%20mini%20mk2%20-%20User%20Guide%20-%20v1.7.pdf)
 and [communication protocol](https://cdn.inmusicbrands.com/akai/attachments/APC%20mini%20mk2%20-%20Communication%20Protocol%20-%20v1.0.pdf).

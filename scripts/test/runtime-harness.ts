@@ -19,6 +19,8 @@ export type RuntimeFunctions = {
   moduleParameterChanged(parameter: MockParameter<unknown>): void;
   decodePadMode(data: number[]): string;
   decodeIntroductionFaders(data: number[]): number[];
+  padLabel(note: number): string;
+  formatMidiValue(value: number): string;
 };
 
 let nextParameterId = 0;
@@ -55,6 +57,10 @@ type RuntimeOptions = {
   connected?: boolean;
   devices?: string[];
   introductionResponseOnSend?: number[];
+  logInterpretedInput?: boolean;
+  logInterpretedOutput?: boolean;
+  sendClock?: boolean;
+  bpm?: number;
 };
 
 export async function createRuntime(options: RuntimeOptions = {}) {
@@ -63,6 +69,7 @@ export async function createRuntime(options: RuntimeOptions = {}) {
     "utf8"
   );
   const warnings: string[] = [];
+  const logs: string[] = [];
   const sysexMessages: number[][] = [];
   let currentTime = 0;
   let updateRate = 0;
@@ -72,6 +79,10 @@ export async function createRuntime(options: RuntimeOptions = {}) {
     options.devices ?? ["APC mini mk2 Control", "APC mini mk2 Control"]
   );
   const isConnected = parameter(options.connected ?? true);
+  const logInterpretedInput = parameter(options.logInterpretedInput ?? false);
+  const logInterpretedOutput = parameter(options.logInterpretedOutput ?? false);
+  const sendClock = parameter(options.sendClock ?? true);
+  const bpm = parameter(options.bpm ?? 120);
 
   type PressedControl = MockContainer<{ isPressed: MockParameter<boolean> }>;
   type PadRow = MockContainer<Record<string, PressedControl>>;
@@ -111,7 +122,12 @@ export async function createRuntime(options: RuntimeOptions = {}) {
     }),
     faders: container(faders)
   });
-  const parameters = container({ devices, isConnected });
+  const parameters = container({
+    devices,
+    isConnected,
+    clock: container({ sendClock, bpm }),
+    logging: container({ logInterpretedInput, logInterpretedOutput })
+  });
   let runtime: RuntimeFunctions;
   const context = vm.createContext({
     local: {
@@ -126,7 +142,7 @@ export async function createRuntime(options: RuntimeOptions = {}) {
     },
     script: container({
       enableLog,
-      log: () => undefined,
+      log: (...values: unknown[]) => logs.push(values.map(String).join(" ")),
       logWarning: (message: string) => warnings.push(message),
       logError: (message: string) => warnings.push(message),
       setUpdateRate: (value: number) => {
@@ -150,7 +166,12 @@ export async function createRuntime(options: RuntimeOptions = {}) {
     shift: shift.isPressed,
     faders,
     sysexMessages,
+    logs,
     warnings,
+    logInterpretedInput,
+    logInterpretedOutput,
+    sendClock,
+    bpm,
     enableLog,
     getUpdateRate: () => updateRate,
     advanceTime: (seconds: number) => {

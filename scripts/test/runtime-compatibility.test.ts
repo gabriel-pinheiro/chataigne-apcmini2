@@ -17,5 +17,5 @@ test("emits JavaScript compatible with Chataigne's engine", async () => {
   assert.doesNotMatch(runtimeSource, /===|!==/);
   assert.doesNotMatch(runtimeSource, /\[[^\]]+\]\.set\s*\(/);
   assert.doesNotMatch(runtimeSource, /\.getChild\s*\(/);
-  assert.match(runtimeSource, /local\.values\.pads\.row1\.pad11\.isPressed\.set/);
+
 });

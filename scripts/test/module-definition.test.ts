@@ -8,6 +8,7 @@ import {
   TRACK_BUTTON_COUNT
 } from "../lib/buttons.js";
 import { CHANNEL_FADER_COUNT, faderValues } from "../lib/faders.js";
+import { moduleDefinition } from "../lib/module-definition.js";
 import {
   PAD_COLUMN_COUNT,
   padParameters,
@@ -60,6 +61,22 @@ test("builds track, scene, shift, and fader controls", () => {
   assert.ok("Shift" in values);
   assert.equal(Object.keys(faders).length, CHANNEL_FADER_COUNT + 1);
   assert.ok("Master Fader" in faders);
+});
+
+test("exposes opt-in interpreted logging controls", () => {
+  const parameters = moduleDefinition.parameters;
+  assert.ok(parameters !== null && !Array.isArray(parameters) && typeof parameters === "object");
+  const logging = parameters.Logging;
+  assert.ok(logging !== null && !Array.isArray(logging) && typeof logging === "object");
+
+  const input = logging["Log Interpreted Input"];
+  const output = logging["Log Interpreted Output"];
+  assert.ok(input !== null && !Array.isArray(input) && typeof input === "object");
+  assert.ok(output !== null && !Array.isArray(output) && typeof output === "object");
+  assert.equal(input.shortName, "logInterpretedInput");
+  assert.equal(output.shortName, "logInterpretedOutput");
+  assert.equal(input.default, false);
+  assert.equal(output.default, false);
 });
 
 test("exposes a stable read-only pad mode status", () => {

@@ -24,10 +24,15 @@ function initializeConnection(): void {
 
 function handleIntroductionResponse(data: number[]): void {
   var faderValues = decodeIntroductionFaders(data);
-  if (faderValues.length != 9) return;
+  if (faderValues.length != 9) {
+    logInvalidIntroductionResponse(data.length);
+    return;
+  }
 
   if (isAmbiguousFaderSnapshot(faderValues)) {
-    if (introductionAttempts < maximumIntroductionAttempts) {
+    var willRetry = introductionAttempts < maximumIntroductionAttempts;
+    logAmbiguousIntroductionResponse(willRetry);
+    if (willRetry) {
       introductionState = 1;
       introductionStateChangedAt = util.getTime();
       return;
@@ -42,6 +47,7 @@ function handleIntroductionResponse(data: number[]): void {
   }
 
   introductionState = 0;
+  logSuccessfulIntroductionResponse(faderValues);
   for (var index = 0; index < faderValues.length; index += 1) {
     setFaderPosition(index, faderValues[index]);
   }
@@ -75,6 +81,7 @@ function updateIntroduction(): void {
     introductionState = 2;
     introductionStateChangedAt = now;
     introductionAttempts += 1;
+    logInitializationRequest(introductionAttempts);
     sendIntroductionRequest();
     return;
   }
