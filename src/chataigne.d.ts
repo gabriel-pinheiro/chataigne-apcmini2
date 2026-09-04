@@ -73,6 +73,14 @@ type IndexedPressedValues<Prefix extends string> = ChataigneContainer & {
   [Index in `${Prefix}${PadColumn}`]: ChataignePressedValue;
 };
 
+interface ChataigneButtonLedParameters extends ChataigneContainer {
+  ledMode: ChataigneEnumParameter;
+}
+
+type IndexedButtonLedParameters<Prefix extends string> = ChataigneContainer & {
+  [Index in `${Prefix}${PadColumn}`]: ChataigneButtonLedParameters;
+};
+
 interface ChataigneFaderValue extends ChataigneContainer {
   position: ChataigneParameter<number>;
 }
@@ -102,6 +110,10 @@ interface ChataigneLocal {
       logInterpretedOutput: ChataigneParameter<boolean>;
     };
     pads: ChataignePadParameterRows;
+    buttons: {
+      trackButtons: IndexedButtonLedParameters<"track">;
+      sceneButtons: IndexedButtonLedParameters<"scene">;
+    };
   };
   values: {
     tempo: ChataigneClockControls;

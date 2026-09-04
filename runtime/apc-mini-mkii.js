@@ -406,9 +406,13 @@ function logPadLedDisabled(note) {
   if (!interpretedOutputLogControl.get()) return;
   script.log("Pad LED Disabled: " + padLabel(note));
 }
-function logFullPadResyncOutput() {
+function logButtonLedOutput(note, modeLabel) {
   if (!interpretedOutputLogControl.get()) return;
-  script.log("Full Resync Sent: 64 pad LEDs");
+  script.log("Button LED Updated: " + buttonLabel(note) + " = " + modeLabel);
+}
+function logFullControllerResyncOutput() {
+  if (!interpretedOutputLogControl.get()) return;
+  script.log("Full Resync Sent: 64 pad LEDs, 16 button LEDs");
 }
 function handleLoggingParameterChange(parameter) {
   if (parameter.is(interpretedInputLogControl)) {
@@ -739,7 +743,6 @@ var padLedEnabledControls = [];
 var padColorModeControls = [];
 var padColorControls = [];
 var padPaletteModeControls = [];
-var padOutputReady = false;
 var registerPadControlOperation = 0;
 var fullResyncPadControlOperation = 1;
 var fullResyncExactMessage = [];
@@ -762,7 +765,7 @@ function registerPadOutput(note, controls) {
   padPaletteModeControls[note] = controls.paletteMode;
 }
 function handlePadOutputParameterChange(parameter) {
-  if (!padOutputReady) return;
+  if (!controllerOutputReady) return;
   for (var note = sessionPadNoteMinimum; note <= sessionPadNoteMaximum; note += 1) {
     if (parameter.is(padLedEnabledControls[note])) {
       sendPadLedUpdate(note);
@@ -783,29 +786,6 @@ function handlePadOutputParameterChange(parameter) {
       return;
     }
   }
-}
-function markPadOutputInitializing() {
-  padOutputReady = false;
-}
-function completePadOutputInitialization() {
-  if (!isPadOutputConnected()) return;
-  if (padOutputReady) return;
-  padOutputReady = true;
-  sendFullPadResync();
-}
-function fullResync() {
-  if (!isPadOutputConnected()) {
-    script.logWarning("Full Resync ignored: MIDI device is disconnected.");
-    return;
-  }
-  if (!padOutputReady) {
-    script.logWarning("Full Resync ignored: device initialization is still pending.");
-    return;
-  }
-  sendFullPadResync();
-}
-function isPadOutputConnected() {
-  return connectionControl.get() && selectedDevice(1) != "";
 }
 function sendPadLedUpdate(note) {
   var ledEnabled = padLedEnabledControls[note].get();
@@ -841,7 +821,6 @@ function sendFullPadResync() {
     fullResyncExactMessage[5] = dataLength & 127;
     local.sendSysex(fullResyncExactMessage);
   }
-  logFullPadResyncOutput();
 }
 function appendPadToFullResync(note, controls) {
   if (!controls.ledEnabled.get()) {
@@ -899,6 +878,112 @@ function normalizedColorByte(component, alpha) {
 }
 function clampNormalized(value) {
   return Math.max(0, Math.min(1, value));
+}
+function visitButtonLedControls(operation) {
+  handleButtonLedControl(operation, 100, local.parameters.buttons.trackButtons.track1.ledMode);
+  handleButtonLedControl(operation, 101, local.parameters.buttons.trackButtons.track2.ledMode);
+  handleButtonLedControl(operation, 102, local.parameters.buttons.trackButtons.track3.ledMode);
+  handleButtonLedControl(operation, 103, local.parameters.buttons.trackButtons.track4.ledMode);
+  handleButtonLedControl(operation, 104, local.parameters.buttons.trackButtons.track5.ledMode);
+  handleButtonLedControl(operation, 105, local.parameters.buttons.trackButtons.track6.ledMode);
+  handleButtonLedControl(operation, 106, local.parameters.buttons.trackButtons.track7.ledMode);
+  handleButtonLedControl(operation, 107, local.parameters.buttons.trackButtons.track8.ledMode);
+  handleButtonLedControl(operation, 112, local.parameters.buttons.sceneButtons.scene1.ledMode);
+  handleButtonLedControl(operation, 113, local.parameters.buttons.sceneButtons.scene2.ledMode);
+  handleButtonLedControl(operation, 114, local.parameters.buttons.sceneButtons.scene3.ledMode);
+  handleButtonLedControl(operation, 115, local.parameters.buttons.sceneButtons.scene4.ledMode);
+  handleButtonLedControl(operation, 116, local.parameters.buttons.sceneButtons.scene5.ledMode);
+  handleButtonLedControl(operation, 117, local.parameters.buttons.sceneButtons.scene6.ledMode);
+  handleButtonLedControl(operation, 118, local.parameters.buttons.sceneButtons.scene7.ledMode);
+  handleButtonLedControl(operation, 119, local.parameters.buttons.sceneButtons.scene8.ledMode);
+}
+var buttonLedModeControls = [];
+var registerButtonLedOperation = 0;
+var resyncButtonLedOperation = 1;
+var peripheralLedMidiChannel = 1;
+function initializeButtonOutput() {
+  visitButtonLedControls(registerButtonLedOperation);
+}
+function handleButtonLedControl(operation, note, control) {
+  if (operation == registerButtonLedOperation) {
+    buttonLedModeControls[note] = control;
+    return;
+  }
+  if (operation == resyncButtonLedOperation) {
+    sendButtonLed(note, control.get());
+  }
+}
+function handleButtonOutputParameterChange(parameter) {
+  if (!controllerOutputReady) return;
+  for (var note = trackButtonNoteMinimum; note <= trackButtonNoteMaximum; note += 1) {
+    if (parameter.is(buttonLedModeControls[note])) {
+      sendButtonLedUpdate(note);
+      return;
+    }
+  }
+  for (var note = sceneButtonNoteMinimum; note <= sceneButtonNoteMaximum; note += 1) {
+    if (parameter.is(buttonLedModeControls[note])) {
+      sendButtonLedUpdate(note);
+      return;
+    }
+  }
+}
+function sendButtonLedUpdate(note) {
+  var mode = buttonLedModeControls[note].get();
+  sendButtonLed(note, mode);
+  logButtonLedOutput(note, buttonLedModeLabel(mode));
+}
+function sendFullButtonResync() {
+  visitButtonLedControls(resyncButtonLedOperation);
+}
+function sendButtonLed(note, mode) {
+  local.sendNoteOn(peripheralLedMidiChannel, note, buttonLedModeVelocity(mode));
+}
+function buttonLedModeVelocity(mode) {
+  if (mode == "on") return 1;
+  if (mode == "blink") return 2;
+  return 0;
+}
+function buttonLedModeLabel(mode) {
+  if (mode == "on") return "On";
+  if (mode == "blink") return "Blink";
+  return "Off";
+}
+var controllerOutputReady = false;
+function initializeControllerOutput() {
+  initializePadOutput();
+  initializeButtonOutput();
+}
+function handleControllerOutputParameterChange(parameter) {
+  handlePadOutputParameterChange(parameter);
+  handleButtonOutputParameterChange(parameter);
+}
+function markControllerOutputInitializing() {
+  controllerOutputReady = false;
+}
+function completeControllerOutputInitialization() {
+  if (!isControllerOutputConnected() || controllerOutputReady) return;
+  controllerOutputReady = true;
+  sendFullControllerResync();
+}
+function fullResync() {
+  if (!isControllerOutputConnected()) {
+    script.logWarning("Full Resync ignored: MIDI device is disconnected.");
+    return;
+  }
+  if (!controllerOutputReady) {
+    script.logWarning("Full Resync ignored: device initialization is still pending.");
+    return;
+  }
+  sendFullControllerResync();
+}
+function isControllerOutputConnected() {
+  return connectionControl.get() && selectedDevice(1) != "";
+}
+function sendFullControllerResync() {
+  sendFullPadResync();
+  sendFullButtonResync();
+  logFullControllerResyncOutput();
 }
 var padModeControl;
 var currentPadMode = "unknown";
@@ -981,7 +1066,7 @@ function handleModuleParameterChange(parameter) {
       resetPressedValues();
       setPadMode("unknown");
       introductionState = 0;
-      markPadOutputInitializing();
+      markControllerOutputInitializing();
       markMidiClockInitializing();
       return;
     }
@@ -1018,7 +1103,7 @@ function handleDeviceChange() {
   scheduleIntroduction();
 }
 function scheduleIntroduction() {
-  markPadOutputInitializing();
+  markControllerOutputInitializing();
   markMidiClockInitializing();
   if (!connectionControl.get() || selectedDevice(0) == "" || selectedDevice(1) == "") {
     introductionState = 0;
@@ -1029,7 +1114,7 @@ function scheduleIntroduction() {
   introductionStateChangedAt = util.getTime();
 }
 function completeDeviceInitialization() {
-  completePadOutputInitialization();
+  completeControllerOutputInitialization();
   completeMidiClockInitialization();
 }
 function isAmbiguousFaderSnapshot(values) {
@@ -1067,7 +1152,7 @@ function init() {
   script.enableLog.set(true);
   script.setUpdateRate(20);
   initializeLogging();
-  initializePadOutput();
+  initializeControllerOutput();
   initializePadMode();
   initializeConnection();
   initializeClock();
@@ -1152,7 +1237,7 @@ function sysExEvent(data) {
 function moduleParameterChanged(parameter) {
   handleClockParameterChange(parameter);
   handleLoggingParameterChange(parameter);
-  handlePadOutputParameterChange(parameter);
+  handleControllerOutputParameterChange(parameter);
   handleModuleParameterChange(parameter);
 }
 function update(_deltaTime) {

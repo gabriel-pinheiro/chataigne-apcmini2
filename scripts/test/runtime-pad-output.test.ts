@@ -49,14 +49,15 @@ test("matches effective colors against the official palette with stable ties", a
 
 test("uses palette black for every disabled pad during full resync", async () => {
   const { sysexMessages, noteMessages } = await createReadyRuntime();
+  const padMessages = noteMessages.filter((message) => message[1] <= 63);
 
   assert.equal(sysexMessages.length, 1);
-  assert.equal(noteMessages.length, 64);
+  assert.equal(padMessages.length, 64);
   const expectedNotes = Array.from(
     { length: 64 },
     (_, index) => (7 - Math.floor(index / 8)) * 8 + index % 8
   );
-  assert.deepEqual(noteMessages, expectedNotes.map((note) => [7, note, 0]));
+  assert.deepEqual(padMessages, expectedNotes.map((note) => [7, note, 0]));
 });
 
 test("sends an immediate Exact RGB update with RGB multiplied by alpha", async () => {
@@ -169,7 +170,8 @@ test("full resync mixes palette Note On messages with combined Exact RGB records
   result.runtime.update(0.11);
   result.runtime.sysExEvent(introductionResponse);
 
-  assert.equal(result.noteMessages.length, 63);
+  const padMessages = result.noteMessages.filter((message) => message[1] <= 63);
+  assert.equal(padMessages.length, 63);
   assert.ok(result.noteMessages.some((message) =>
     message[0] === 10 && message[1] === 49 && message[2] === 5
   ));
@@ -180,7 +182,7 @@ test("full resync mixes palette Note On messages with combined Exact RGB records
     0x47, 0x7f, 0x4f, 0x24, 0x00, 0x08,
     56, 56, 1, 127, 1, 127, 1, 127
   ]);
-  assert.equal(result.logs.at(-1), "Full Resync Sent: 64 pad LEDs");
+  assert.equal(result.logs.at(-1), "Full Resync Sent: 64 pad LEDs, 16 button LEDs");
 });
 
 test("suppresses pad output while initializing and resyncs only the latest state", async () => {
@@ -199,7 +201,7 @@ test("suppresses pad output while initializing and resyncs only the latest state
   runtime.update(0.11);
   runtime.sysExEvent(introductionResponse);
 
-  assert.equal(noteMessages.length, 63);
+  assert.equal(noteMessages.filter((message) => message[1] <= 63).length, 63);
   assert.equal(sysexMessages.length, 2);
   assert.deepEqual(sysexMessages[1], [
     0x47, 0x7f, 0x4f, 0x24, 0x00, 0x08,
@@ -217,7 +219,7 @@ test("resyncs after initialization timeout while keeping the timeout warning", a
   runtime.update(1.01);
 
   assert.equal(sysexMessages.length, 1);
-  assert.equal(noteMessages.length, 64);
+  assert.equal(noteMessages.filter((message) => message[1] <= 63).length, 64);
   assert.equal(warnings.length, 1);
   assert.match(warnings[0], /did not respond to initialization/);
 });
@@ -245,7 +247,7 @@ test("runs manual Full Resync only when ready and gates its summary log", async 
   readyWithoutLogs.noteMessages.length = 0;
   readyWithoutLogs.sysexMessages.length = 0;
   readyWithoutLogs.runtime.fullResync();
-  assert.equal(readyWithoutLogs.noteMessages.length, 64);
+  assert.equal(readyWithoutLogs.noteMessages.length, 80);
   assert.equal(readyWithoutLogs.sysexMessages.length, 0);
   assert.deepEqual(readyWithoutLogs.logs, []);
 
@@ -254,7 +256,9 @@ test("runs manual Full Resync only when ready and gates its summary log", async 
   readyWithLogs.sysexMessages.length = 0;
   readyWithLogs.logs.length = 0;
   readyWithLogs.runtime.fullResync();
-  assert.equal(readyWithLogs.noteMessages.length, 64);
+  assert.equal(readyWithLogs.noteMessages.length, 80);
   assert.equal(readyWithLogs.sysexMessages.length, 0);
-  assert.deepEqual(readyWithLogs.logs, ["Full Resync Sent: 64 pad LEDs"]);
+  assert.deepEqual(readyWithLogs.logs, [
+    "Full Resync Sent: 64 pad LEDs, 16 button LEDs"
+  ]);
 });

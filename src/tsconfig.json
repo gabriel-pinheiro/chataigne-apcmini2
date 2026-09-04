@@ -16,6 +16,9 @@
     "lib/palette.ts",
     "lib/pad-controls.ts",
     "lib/pad-output.ts",
+    "lib/button-controls.ts",
+    "lib/button-output.ts",
+    "lib/output.ts",
     "lib/mode.ts",
     "lib/connection.ts",
     "apc-mini-mkii.ts"

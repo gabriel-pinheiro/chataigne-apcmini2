@@ -11,6 +11,9 @@ const sourceFiles = [
   "src/lib/palette.ts",
   "src/lib/pad-controls.ts",
   "src/lib/pad-output.ts",
+  "src/lib/button-controls.ts",
+  "src/lib/button-output.ts",
+  "src/lib/output.ts",
   "src/lib/mode.ts",
   "src/lib/connection.ts",
   "src/apc-mini-mkii.ts"

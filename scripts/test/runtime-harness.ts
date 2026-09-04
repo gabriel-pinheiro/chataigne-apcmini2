@@ -113,6 +113,9 @@ export async function createRuntime(options: RuntimeOptions = {}) {
     paletteMode: MockParameter<string>;
   }>;
   type PadParameterRow = MockContainer<Record<string, PadParameterControl>>;
+  type ButtonParameterControl = MockContainer<{
+    ledMode: MockParameter<string>;
+  }>;
   type FaderControl = MockContainer<{ position: MockParameter<number> }>;
 
   const pads: Record<string, PadRow> = {};
@@ -135,9 +138,13 @@ export async function createRuntime(options: RuntimeOptions = {}) {
 
   const trackButtons: Record<string, PressedControl> = {};
   const sceneButtons: Record<string, PressedControl> = {};
+  const trackButtonParameters: Record<string, ButtonParameterControl> = {};
+  const sceneButtonParameters: Record<string, ButtonParameterControl> = {};
   for (let index = 1; index <= 8; index += 1) {
     trackButtons[`track${index}`] = container({ isPressed: parameter(false) });
     sceneButtons[`scene${index}`] = container({ isPressed: parameter(false) });
+    trackButtonParameters[`track${index}`] = container({ ledMode: parameter("off") });
+    sceneButtonParameters[`scene${index}`] = container({ ledMode: parameter("off") });
   }
 
   const faders: Record<string, FaderControl> = {};
@@ -164,7 +171,11 @@ export async function createRuntime(options: RuntimeOptions = {}) {
     isConnected,
     clock: container({ sendClock, bpm }),
     logging: container({ logInterpretedInput, logInterpretedOutput }),
-    pads: container(padParameters)
+    pads: container(padParameters),
+    buttons: container({
+      trackButtons: container(trackButtonParameters),
+      sceneButtons: container(sceneButtonParameters)
+    })
   });
   let runtime: RuntimeFunctions;
   const context = vm.createContext({
@@ -206,6 +217,8 @@ export async function createRuntime(options: RuntimeOptions = {}) {
     padParameters,
     trackButtons,
     sceneButtons,
+    trackButtonParameters,
+    sceneButtonParameters,
     shift: shift.isPressed,
     faders,
     noteMessages,

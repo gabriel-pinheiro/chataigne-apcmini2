@@ -37,12 +37,15 @@ levels, four pulse rates, and five blink rates. Pulse and blink subdivisions
 follow MIDI Beat Clock; the module's `Clock > Send Clock` control is enabled by
 default so animated modes work without additional configuration.
 
-The module sends the complete current pad state after initialization, including
-after the initialization timeout. Disabled pads are explicitly sent as black,
-so reconnecting cannot leave stale LEDs on the controller. The `Full Resync`
-command can resend all 64 pads at any time after initialization; invoking it
-while disconnected or while initialization is pending produces a warning and
-is otherwise ignored.
+All eight Track LEDs and eight Scene LEDs support their native Off, On, and
+Blink modes. Shift is input-only because the controller has no Shift LED.
+
+The module sends the complete current LED state after initialization, including
+after the initialization timeout. Disabled pads and Off buttons are explicitly
+sent off, so reconnecting cannot leave stale LEDs on the controller. The
+`Full Resync` command can resend all 64 pads and all 16 Track/Scene button LEDs
+at any time after initialization; invoking it while disconnected or while
+initialization is pending produces a warning and is otherwise ignored.
 
 Chataigne exposes `Full Resync` in command and consequence choosers, not in the
 module inspector. After updating this module's `module.json`, use

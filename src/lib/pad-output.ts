@@ -2,7 +2,6 @@ var padLedEnabledControls: ChataigneParameter<boolean>[] = [];
 var padColorModeControls: ChataigneEnumParameter[] = [];
 var padColorControls: ChataigneParameter<[number, number, number, number]>[] = [];
 var padPaletteModeControls: ChataigneEnumParameter[] = [];
-var padOutputReady = false;
 
 var registerPadControlOperation = 0;
 var fullResyncPadControlOperation = 1;
@@ -35,7 +34,7 @@ function registerPadOutput(note: number, controls: ChataignePadParameters): void
 }
 
 function handlePadOutputParameterChange(parameter: ChataigneParameter<unknown>): void {
-  if (!padOutputReady) return;
+  if (!controllerOutputReady) return;
 
   for (var note = sessionPadNoteMinimum; note <= sessionPadNoteMaximum; note += 1) {
     if (parameter.is(padLedEnabledControls[note])) {
@@ -61,33 +60,6 @@ function handlePadOutputParameterChange(parameter: ChataigneParameter<unknown>):
       return;
     }
   }
-}
-
-function markPadOutputInitializing(): void {
-  padOutputReady = false;
-}
-
-function completePadOutputInitialization(): void {
-  if (!isPadOutputConnected()) return;
-  if (padOutputReady) return;
-  padOutputReady = true;
-  sendFullPadResync();
-}
-
-function fullResync(): void {
-  if (!isPadOutputConnected()) {
-    script.logWarning("Full Resync ignored: MIDI device is disconnected.");
-    return;
-  }
-  if (!padOutputReady) {
-    script.logWarning("Full Resync ignored: device initialization is still pending.");
-    return;
-  }
-  sendFullPadResync();
-}
-
-function isPadOutputConnected(): boolean {
-  return connectionControl.get() && selectedDevice(1) != "";
 }
 
 function sendPadLedUpdate(note: number): void {
@@ -128,7 +100,6 @@ function sendFullPadResync(): void {
     fullResyncExactMessage[5] = dataLength & 0x7f;
     local.sendSysex(fullResyncExactMessage);
   }
-  logFullPadResyncOutput();
 }
 
 function appendPadToFullResync(note: number, controls: ChataignePadParameters): void {

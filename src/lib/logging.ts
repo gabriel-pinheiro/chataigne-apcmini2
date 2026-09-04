@@ -129,9 +129,14 @@ function logPadLedDisabled(note: number): void {
   script.log("Pad LED Disabled: " + padLabel(note));
 }
 
-function logFullPadResyncOutput(): void {
+function logButtonLedOutput(note: number, modeLabel: string): void {
   if (!interpretedOutputLogControl.get()) return;
-  script.log("Full Resync Sent: 64 pad LEDs");
+  script.log("Button LED Updated: " + buttonLabel(note) + " = " + modeLabel);
+}
+
+function logFullControllerResyncOutput(): void {
+  if (!interpretedOutputLogControl.get()) return;
+  script.log("Full Resync Sent: 64 pad LEDs, 16 button LEDs");
 }
 
 function handleLoggingParameterChange(parameter: ChataigneParameter<unknown>): void {

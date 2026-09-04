@@ -66,7 +66,7 @@ function handleModuleParameterChange(parameter: ChataigneParameter<unknown>): vo
       resetPressedValues();
       setPadMode("unknown");
       introductionState = 0;
-      markPadOutputInitializing();
+      markControllerOutputInitializing();
       markMidiClockInitializing();
       return;
     }
@@ -115,7 +115,7 @@ function handleDeviceChange(): void {
 }
 
 function scheduleIntroduction(): void {
-  markPadOutputInitializing();
+  markControllerOutputInitializing();
   markMidiClockInitializing();
   if (!connectionControl.get()
     || selectedDevice(0) == ""
@@ -129,7 +129,7 @@ function scheduleIntroduction(): void {
 }
 
 function completeDeviceInitialization(): void {
-  completePadOutputInitialization();
+  completeControllerOutputInitialization();
   completeMidiClockInitialization();
 }
 

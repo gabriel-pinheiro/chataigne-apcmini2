@@ -2,7 +2,7 @@ function init(): void {
   script.enableLog.set(true);
   script.setUpdateRate(20);
   initializeLogging();
-  initializePadOutput();
+  initializeControllerOutput();
   initializePadMode();
   initializeConnection();
   initializeClock();
@@ -99,7 +99,7 @@ function sysExEvent(data: number[]): void {
 function moduleParameterChanged(parameter: ChataigneParameter<unknown>): void {
   handleClockParameterChange(parameter);
   handleLoggingParameterChange(parameter);
-  handlePadOutputParameterChange(parameter);
+  handleControllerOutputParameterChange(parameter);
   handleModuleParameterChange(parameter);
 }
 
