@@ -12,20 +12,21 @@ The module exposes live, read-only values for:
 
 When the MIDI input disconnects or changes, held pad and button values reset to
 false. Faders retain their last value. On connection, the module requests all
-nine current fader positions from the controller. Some controller states return
-`127` for all nine faders regardless of their physical positions; the module
-retries once and preserves its last known values if that ambiguous response is
-repeated.
+nine current fader positions from the controller.
 
-Select `APC mini mk2 Control` for both MIDI input and output, even if you're going to use just one of them. Both are important for the handshake.
+Select `APC mini mk2 Control` for both MIDI input and output, even if you only
+intend to use input or output. Both directions are required for identity,
+initial fader discovery, pad-mode detection, and reliable reconnect behavior.
+Do not use the `APC mini mk2 Notes` port.
 
 ### Interpreted logging
 
 `Parameters > Logging` contains opt-in `Log Interpreted Input` and
 `Log Interpreted Output` controls. These produce concise controller-aware
-messages for pads, buttons, faders, modes, initialization, and MIDI Clock
-configuration. They are independent from Chataigne's raw MIDI logging toggles.
-Operational warnings remain enabled regardless of these settings.
+messages for pads, buttons, faders, modes, Identity and Introduction handshake
+traffic, and MIDI Clock configuration. They are independent from Chataigne's
+raw MIDI logging toggles. Operational warnings remain enabled regardless of
+these settings.
 
 ## Implemented output
 
@@ -38,6 +39,14 @@ Hardware Palette supports all native LED behaviors: seven solid brightness
 levels, four pulse rates, and five blink rates. Pulse and blink subdivisions
 follow MIDI Beat Clock; the module's `Clock > Send Clock` control is enabled by
 default so animated modes work without additional configuration.
+
+### Chataigne 1.10.3 removal issue
+
+Chataigne 1.10.3 can crash when a MIDI module is removed while its native MIDI
+Clock sender is running. Before deleting this module, turn off
+`Parameters > Clock > Send Clock`. The crash is in Chataigne's MIDI module
+teardown rather than this module's script; it can affect any MIDI module that
+is actively sending Clock.
 
 All eight Track LEDs and eight Scene LEDs support their native Off, On, and
 Blink modes. Shift is input-only because the controller has no Shift LED.

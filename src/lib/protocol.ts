@@ -20,6 +20,10 @@ var faderCcMaximum = 56;
 
 var akaiManufacturerId = 0x47;
 var apcProductId = 0x4f;
+var universalNonRealtimeId = 0x7e;
+var identityMessageId = 0x06;
+var identityRequestId = 0x01;
+var identityReplyId = 0x02;
 var introductionRequestId = 0x60;
 var introductionResponseId = 0x61;
 var padModeMessageId = 0x62;
@@ -30,6 +34,20 @@ function isApcSysex(data: number[], messageId: number): boolean {
     && data[1] == 0x7f
     && data[2] == apcProductId
     && data[3] == messageId;
+}
+
+function isIdentityReply(data: number[]): boolean {
+  return data.length >= 4
+    && data[0] == universalNonRealtimeId
+    && data[2] == identityMessageId
+    && data[3] == identityReplyId;
+}
+
+function isApcIdentityReply(data: number[]): boolean {
+  return isIdentityReply(data)
+    && data.length >= 6
+    && data[4] == akaiManufacturerId
+    && data[5] == apcProductId;
 }
 
 function decodePadMode(data: number[]): PadMode | "" {
@@ -67,6 +85,16 @@ function sendIntroductionRequest(): void {
     0x00,
     0x01,
     0x00
+  );
+}
+
+function sendIdentityRequest(): void {
+  // Chataigne/JUCE adds the framing F0 and F7 bytes.
+  local.sendSysex(
+    universalNonRealtimeId,
+    0x00,
+    identityMessageId,
+    identityRequestId
   );
 }
 

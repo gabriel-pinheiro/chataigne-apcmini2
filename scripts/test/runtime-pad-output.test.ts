@@ -223,7 +223,7 @@ test("resyncs after initialization timeout while keeping the timeout warning", a
   assert.equal(sysexMessages.length, 2);
   assert.equal(noteMessages.filter((message) => message[1] <= 63).length, 64);
   assert.equal(warnings.length, 1);
-  assert.match(warnings[0], /did not respond to initialization/);
+  assert.match(warnings[0], /Introduction did not respond/);
 });
 
 test("runs manual Full Resync only when ready and gates its summary log", async () => {

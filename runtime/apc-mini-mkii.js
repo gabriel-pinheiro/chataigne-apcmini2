@@ -13,11 +13,21 @@ var faderCcMinimum = 48;
 var faderCcMaximum = 56;
 var akaiManufacturerId = 71;
 var apcProductId = 79;
+var universalNonRealtimeId = 126;
+var identityMessageId = 6;
+var identityRequestId = 1;
+var identityReplyId = 2;
 var introductionRequestId = 96;
 var introductionResponseId = 97;
 var padModeMessageId = 98;
 function isApcSysex(data, messageId) {
   return data.length >= 4 && data[0] == akaiManufacturerId && data[1] == 127 && data[2] == apcProductId && data[3] == messageId;
+}
+function isIdentityReply(data) {
+  return data.length >= 4 && data[0] == universalNonRealtimeId && data[2] == identityMessageId && data[3] == identityReplyId;
+}
+function isApcIdentityReply(data) {
+  return isIdentityReply(data) && data.length >= 6 && data[4] == akaiManufacturerId && data[5] == apcProductId;
 }
 function decodePadMode(data) {
   if (!isApcSysex(data, padModeMessageId) || data.length < 7) return "";
@@ -49,6 +59,14 @@ function sendIntroductionRequest() {
     0,
     1,
     0
+  );
+}
+function sendIdentityRequest() {
+  local.sendSysex(
+    universalNonRealtimeId,
+    0,
+    identityMessageId,
+    identityRequestId
   );
 }
 function normalizeMidiValue(value) {
@@ -369,28 +387,46 @@ function logUnrecognizedSysexInput(data) {
 }
 function logInvalidIntroductionResponse(byteCount) {
   if (!interpretedInputLogControl.get()) return;
-  script.log("Initialization Response Invalid: " + byteCount + " payload bytes");
+  script.log("Introduction Response Invalid: " + byteCount + " payload bytes");
 }
 function logAmbiguousIntroductionResponse(willRetry) {
   if (!interpretedInputLogControl.get()) return;
   if (willRetry) {
-    script.log("Initialization Response: all faders returned 127; retrying");
+    script.log("Introduction Response: all faders returned 127; retrying");
   } else {
-    script.log("Initialization Response: all faders returned 127; keeping last known values");
+    script.log("Introduction Response: all faders returned 127; keeping last known values");
   }
 }
 function logSuccessfulIntroductionResponse(values) {
   if (!interpretedInputLogControl.get()) return;
-  var message = "Initialization Complete: ";
+  var message = "Introduction Complete: ";
   for (var index = 0; index < values.length; index += 1) {
     if (index > 0) message += ", ";
     message += faderLabel(index) + " = " + formatMidiValue(values[index]);
   }
   script.log(message);
 }
-function logInitializationRequest(attempt) {
+function logIdentityRequest() {
   if (!interpretedOutputLogControl.get()) return;
-  script.log("Initialization Request Sent: attempt " + attempt);
+  script.log("Identity Request Sent");
+}
+function logIdentityReply(data, isApc) {
+  if (!interpretedInputLogControl.get()) return;
+  if (!isApc) {
+    script.log(
+      "Identity Reply: manufacturer " + (data.length >= 5 ? data[4] : "unknown") + ", product " + (data.length >= 6 ? data[5] : "unknown")
+    );
+    return;
+  }
+  var revision = data.length >= 12 ? formatByteRange(data, 8, 4) : "unavailable";
+  var deviceId = data.length >= 13 ? "" + data[12] : "unavailable";
+  script.log(
+    "Identity Reply: APC Mini mkII, software revision bytes [" + revision + "], device ID " + deviceId
+  );
+}
+function logIntroductionRequest(attempt) {
+  if (!interpretedOutputLogControl.get()) return;
+  script.log("Introduction Request Sent: attempt " + attempt);
 }
 function logPadLedOutput(note, rgb) {
   if (!interpretedOutputLogControl.get()) return;
@@ -482,6 +518,15 @@ function formatHexByte(value) {
 }
 function formatRgbHex(rgb) {
   return "#" + formatHexByte(rgb[0]) + formatHexByte(rgb[1]) + formatHexByte(rgb[2]);
+}
+function formatByteRange(values, start, count) {
+  var result = "";
+  var end = Math.min(values.length, start + count);
+  for (var index = start; index < end; index += 1) {
+    if (result != "") result += ", ";
+    result += values[index];
+  }
+  return result;
 }
 var hardwarePaletteColors = [
   0,
@@ -1018,9 +1063,12 @@ var invalidInitialMidiInputValue = "MIDI Devices to connect to";
 var introductionState = 0;
 var introductionStateChangedAt = 0;
 var deviceSettleDelaySeconds = 0.1;
+var identityReplyTimeoutSeconds = 0.5;
 var introductionRetryDelaySeconds = 0.5;
+var ambiguousFaderRetryDelaySeconds = 0.1;
 var introductionAttempts = 0;
 var maximumIntroductionAttempts = 2;
+var identityResult = "not requested";
 function initializeConnection() {
   deviceControls = local.parameters.devices;
   connectionControl = local.parameters.isConnected;
@@ -1038,7 +1086,7 @@ function handleIntroductionResponse(data) {
     var willRetry = introductionAttempts < maximumIntroductionAttempts;
     logAmbiguousIntroductionResponse(willRetry);
     if (willRetry) {
-      introductionState = 1;
+      introductionState = 4;
       introductionStateChangedAt = util.getTime();
       return;
     }
@@ -1055,6 +1103,20 @@ function handleIntroductionResponse(data) {
     setFaderPosition(index, faderValues[index]);
   }
   completeDeviceInitialization();
+}
+function handleIdentityReply(data) {
+  var isApc = isApcIdentityReply(data);
+  logIdentityReply(data, isApc);
+  if (introductionState != 2) return;
+  if (!isApc) {
+    introductionState = 0;
+    script.logWarning(
+      "The selected MIDI device returned an Identity Reply, but it is not an APC mini mk2. Initialization was blocked."
+    );
+    return;
+  }
+  identityResult = "APC mini mk2 reply";
+  sendIntroductionAttempt(util.getTime());
 }
 function handleModuleParameterChange(parameter) {
   if (sameControl(parameter, deviceControls)) {
@@ -1076,16 +1138,26 @@ function updateIntroduction() {
     beginIntroductionAfterDeviceSettle(now);
     return;
   }
-  if (introductionState == 2 && now - introductionStateChangedAt >= introductionRetryDelaySeconds) {
+  if (introductionState == 2 && now - introductionStateChangedAt >= identityReplyTimeoutSeconds) {
+    identityResult = "no reply after " + Math.round(identityReplyTimeoutSeconds * 1e3) + " ms";
+    script.logWarning(
+      "APC Mini mkII did not respond to Identity Request after " + Math.round(identityReplyTimeoutSeconds * 1e3) + " ms. Continuing with Introduction."
+    );
+    sendIntroductionAttempt(now);
+    return;
+  }
+  if (introductionState == 3 && now - introductionStateChangedAt >= introductionRetryDelaySeconds) {
     if (introductionAttempts < maximumIntroductionAttempts) {
       sendIntroductionAttempt(now);
       return;
     }
     introductionState = 0;
-    script.logWarning(
-      "APC Mini mkII did not respond to initialization. Verify that APC mini mk2 Control (not Notes) is selected for both MIDI devices."
-    );
+    logIntroductionTimeoutWarning();
     completeDeviceInitialization();
+    return;
+  }
+  if (introductionState == 4 && now - introductionStateChangedAt >= ambiguousFaderRetryDelaySeconds) {
+    sendIntroductionAttempt(now);
   }
 }
 function handleDeviceChange() {
@@ -1101,6 +1173,7 @@ function scheduleIntroduction() {
   markControllerOutputInitializing();
   markMidiClockInitializing();
   introductionAttempts = 0;
+  identityResult = "not requested";
   introductionState = 1;
   introductionStateChangedAt = util.getTime();
 }
@@ -1111,14 +1184,31 @@ function beginIntroductionAfterDeviceSettle(now) {
     introductionState = 0;
     return;
   }
-  sendIntroductionAttempt(now);
+  sendIdentityRequestForInitialization(now);
 }
-function sendIntroductionAttempt(now) {
+function sendIdentityRequestForInitialization(now) {
   introductionState = 2;
   introductionStateChangedAt = now;
+  logIdentityRequest();
+  sendIdentityRequest();
+}
+function sendIntroductionAttempt(now) {
+  introductionState = 3;
+  introductionStateChangedAt = now;
   introductionAttempts += 1;
-  logInitializationRequest(introductionAttempts);
+  logIntroductionRequest(introductionAttempts);
   sendIntroductionRequest();
+}
+function logIntroductionTimeoutWarning() {
+  if (identityResult == "APC mini mk2 reply") {
+    script.logWarning(
+      "APC Mini mkII identity succeeded, but Introduction did not respond. The Notes port or mismatched MIDI input and output ports are probably selected. Select APC mini mk2 Control for both MIDI devices. Incoming MIDI and LED output will continue, but initial fader positions may be unknown."
+    );
+    return;
+  }
+  script.logWarning(
+    "The selected MIDI device did not respond to APC Mini mkII Identity or Introduction. Verify that APC mini mk2 Control is selected for both MIDI devices. Incoming MIDI and LED output will continue, but initial fader positions may be unknown."
+  );
 }
 function completeDeviceInitialization() {
   completeControllerOutputInitialization();
@@ -1258,6 +1348,10 @@ function ccEvent(channel, number, value) {
   logFaderInput(faderIndex, value);
 }
 function sysExEvent(data) {
+  if (isIdentityReply(data)) {
+    handleIdentityReply(data);
+    return;
+  }
   var mode = decodePadMode(data);
   if (mode != "") {
     setPadMode(mode);

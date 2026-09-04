@@ -73,6 +73,7 @@ function container<T extends Record<string, unknown>>(children: T): MockContaine
 type RuntimeOptions = {
   connected?: boolean;
   devices?: string[];
+  identityResponseOnSend?: number[] | false;
   introductionResponseOnSend?: number[];
   logInterpretedInput?: boolean;
   logInterpretedOutput?: boolean;
@@ -90,6 +91,7 @@ export async function createRuntime(options: RuntimeOptions = {}) {
   const warnings: string[] = [];
   const logs: string[] = [];
   const noteMessages: number[][] = [];
+  const identityMessages: number[][] = [];
   const sysexMessages: number[][] = [];
   let currentTime = 0;
   let updateRate = 0;
@@ -189,6 +191,23 @@ export async function createRuntime(options: RuntimeOptions = {}) {
       },
       sendSysex: (...parts: Array<number | number[]>) => {
         const message = parts.flatMap((part) => typeof part === "number" ? [part] : part);
+        if (message.length == 4
+          && message[0] == 0x7e
+          && message[2] == 0x06
+          && message[3] == 0x01) {
+          identityMessages.push(message);
+          const defaultIdentityResponse = [
+            0x7e, 0x00, 0x06, 0x02, 0x47, 0x4f, 0x00, 0x19,
+            0x00, 0x01, 0x00, 0x00, 0x7f,
+            1, 2, 3, 4,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+          ];
+          const response = options.identityResponseOnSend === false
+            ? undefined
+            : options.identityResponseOnSend ?? defaultIdentityResponse;
+          if (response) runtime.sysExEvent(response);
+          return;
+        }
         sysexMessages.push(message);
         if (options.introductionResponseOnSend && message[3] === 0x60) {
           runtime.sysExEvent(options.introductionResponseOnSend);
@@ -224,6 +243,7 @@ export async function createRuntime(options: RuntimeOptions = {}) {
     shift: shift.isPressed,
     faders,
     noteMessages,
+    identityMessages,
     sysexMessages,
     logs,
     warnings,

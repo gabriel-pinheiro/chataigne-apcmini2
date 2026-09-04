@@ -3,15 +3,24 @@ import test from "node:test";
 
 import { createRuntime } from "./runtime-harness.js";
 
-test("requests initialization and applies all returned fader positions", async () => {
-  const { runtime, advanceTime, sysexMessages, faders, warnings, getUpdateRate, enableLog } =
-    await createRuntime();
+test("requests identity before initialization and applies all returned fader positions", async () => {
+  const {
+    runtime,
+    advanceTime,
+    identityMessages,
+    sysexMessages,
+    faders,
+    warnings,
+    getUpdateRate,
+    enableLog
+  } = await createRuntime();
   runtime.init();
   assert.equal(getUpdateRate(), 20);
   assert.equal(enableLog.get(), true);
 
   advanceTime(0.11);
   runtime.update(0.11);
+  assert.deepEqual(identityMessages, [[0x7e, 0x00, 0x06, 0x01]]);
   assert.deepEqual(sysexMessages, [[
     0x47, 0x7f, 0x4f, 0x60, 0x00, 0x04, 0x00, 0x00, 0x01, 0x00
   ]]);
@@ -28,6 +37,66 @@ test("requests initialization and applies all returned fader positions", async (
   advanceTime(2);
   runtime.update(2);
   assert.deepEqual(warnings, []);
+});
+
+test("continues with Introduction when Identity Reply times out", async () => {
+  const result = await createRuntime({ identityResponseOnSend: false });
+  result.runtime.init();
+
+  result.advanceTime(0.11);
+  result.runtime.update(0.11);
+  assert.deepEqual(result.identityMessages, [[0x7e, 0x00, 0x06, 0x01]]);
+  assert.deepEqual(result.sysexMessages, []);
+
+  result.advanceTime(0.49);
+  result.runtime.update(0.49);
+  assert.deepEqual(result.sysexMessages, []);
+
+  result.advanceTime(0.02);
+  result.runtime.update(0.02);
+  assert.equal(result.sysexMessages.length, 1);
+  assert.equal(result.warnings.length, 1);
+  assert.match(result.warnings[0], /did not respond to Identity Request after 500 ms/);
+});
+
+test("blocks initialization after a non-APC Identity Reply", async () => {
+  const result = await createRuntime({
+    identityResponseOnSend: [0x7e, 0x00, 0x06, 0x02, 0x01, 0x02]
+  });
+  result.runtime.init();
+  result.advanceTime(0.11);
+  result.runtime.update(0.11);
+
+  assert.equal(result.identityMessages.length, 1);
+  assert.deepEqual(result.sysexMessages, []);
+  assert.equal(result.warnings.length, 1);
+  assert.match(result.warnings[0], /not an APC mini mk2/);
+});
+
+test("logs concise Identity and Introduction messages when interpreted logging is enabled", async () => {
+  const result = await createRuntime({
+    logInterpretedInput: true,
+    logInterpretedOutput: true,
+    introductionResponseOnSend: [
+      0x47, 0x7f, 0x4f, 0x61, 0x00, 0x04,
+      64, 0, 1, 2, 3, 4, 5, 6, 127
+    ]
+  });
+  result.runtime.init();
+  result.advanceTime(0.11);
+  result.runtime.update(0.11);
+
+  assert.deepEqual(result.logs, [
+    "MIDI Clock Enabled: 120 BPM",
+    "Identity Request Sent",
+    "Identity Reply: APC Mini mkII, software revision bytes [0, 1, 0, 0], device ID 127",
+    "Introduction Request Sent: attempt 1",
+    "Introduction Complete: Fader 1 = 64 (50.4%), Fader 2 = 0 (0%), "
+      + "Fader 3 = 1 (0.8%), Fader 4 = 2 (1.6%), Fader 5 = 3 (2.4%), "
+      + "Fader 6 = 4 (3.1%), Fader 7 = 5 (3.9%), Fader 8 = 6 (4.7%), "
+      + "Master Fader = 127 (100%)",
+    "Full Resync Sent: 64 pad LEDs, 16 button LEDs"
+  ]);
 });
 
 test("warns after an initialization timeout without disabling live input", async () => {
@@ -227,14 +296,20 @@ test("retries a missing Introduction response after 500 ms", async () => {
   result.runtime.update(0.02);
   assert.equal(result.sysexMessages.length, 2);
   assert.deepEqual(result.logs.slice(-2), [
-    "Initialization Request Sent: attempt 1",
-    "Initialization Request Sent: attempt 2"
+    "Introduction Request Sent: attempt 1",
+    "Introduction Request Sent: attempt 2"
   ]);
 
   result.advanceTime(0.51);
   result.runtime.update(0.51);
   assert.equal(result.warnings.length, 1);
-  assert.match(result.warnings[0], /did not respond to initialization/);
+  assert.equal(
+    result.warnings[0],
+    "APC Mini mkII identity succeeded, but Introduction did not respond. "
+      + "The Notes port or mismatched MIDI input and output ports are probably selected. "
+      + "Select APC mini mk2 Control for both MIDI devices. "
+      + "Incoming MIDI and LED output will continue, but initial fader positions may be unknown."
+  );
 });
 
 test("does not lose an immediate Introduction response", async () => {

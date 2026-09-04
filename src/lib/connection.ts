@@ -6,13 +6,17 @@ var currentDeviceConfigurationWarning = "";
 var invalidInitialMidiInputValue = "MIDI Devices to connect to";
 
 // 0 = idle, 1 = waiting for Chataigne's device state to settle,
-// 2 = awaiting an Introduction response.
+// 2 = awaiting an Identity Reply, 3 = awaiting an Introduction Response,
+// 4 = waiting to retry an all-127 Introduction snapshot.
 var introductionState = 0;
 var introductionStateChangedAt = 0;
 var deviceSettleDelaySeconds = 0.1;
+var identityReplyTimeoutSeconds = 0.5;
 var introductionRetryDelaySeconds = 0.5;
+var ambiguousFaderRetryDelaySeconds = 0.1;
 var introductionAttempts = 0;
 var maximumIntroductionAttempts = 2;
+var identityResult = "not requested";
 
 function initializeConnection(): void {
   deviceControls = local.parameters.devices;
@@ -34,7 +38,7 @@ function handleIntroductionResponse(data: number[]): void {
     var willRetry = introductionAttempts < maximumIntroductionAttempts;
     logAmbiguousIntroductionResponse(willRetry);
     if (willRetry) {
-      introductionState = 1;
+      introductionState = 4;
       introductionStateChangedAt = util.getTime();
       return;
     }
@@ -54,6 +58,24 @@ function handleIntroductionResponse(data: number[]): void {
     setFaderPosition(index, faderValues[index]);
   }
   completeDeviceInitialization();
+}
+
+function handleIdentityReply(data: number[]): void {
+  var isApc = isApcIdentityReply(data);
+  logIdentityReply(data, isApc);
+  if (introductionState != 2) return;
+
+  if (!isApc) {
+    introductionState = 0;
+    script.logWarning(
+      "The selected MIDI device returned an Identity Reply, but it is not an APC mini mk2. "
+      + "Initialization was blocked."
+    );
+    return;
+  }
+
+  identityResult = "APC mini mk2 reply";
+  sendIntroductionAttempt(util.getTime());
 }
 
 function handleModuleParameterChange(parameter: ChataigneParameter<unknown>): void {
@@ -82,6 +104,18 @@ function updateIntroduction(): void {
   }
 
   if (introductionState == 2
+    && now - introductionStateChangedAt >= identityReplyTimeoutSeconds) {
+    identityResult = "no reply after " + Math.round(identityReplyTimeoutSeconds * 1000) + " ms";
+    script.logWarning(
+      "APC Mini mkII did not respond to Identity Request after "
+      + Math.round(identityReplyTimeoutSeconds * 1000)
+      + " ms. Continuing with Introduction."
+    );
+    sendIntroductionAttempt(now);
+    return;
+  }
+
+  if (introductionState == 3
     && now - introductionStateChangedAt >= introductionRetryDelaySeconds) {
     if (introductionAttempts < maximumIntroductionAttempts) {
       sendIntroductionAttempt(now);
@@ -89,12 +123,14 @@ function updateIntroduction(): void {
     }
 
     introductionState = 0;
-    script.logWarning(
-      "APC Mini mkII did not respond to initialization. "
-      + "Verify that APC mini mk2 Control (not Notes) is selected for both MIDI devices. "
-      + "Incoming MIDI will continue, but initial fader positions may be unknown."
-    );
+    logIntroductionTimeoutWarning();
     completeDeviceInitialization();
+    return;
+  }
+
+  if (introductionState == 4
+    && now - introductionStateChangedAt >= ambiguousFaderRetryDelaySeconds) {
+    sendIntroductionAttempt(now);
   }
 }
 
@@ -114,6 +150,7 @@ function scheduleIntroduction(): void {
   markControllerOutputInitializing();
   markMidiClockInitializing();
   introductionAttempts = 0;
+  identityResult = "not requested";
   introductionState = 1;
   introductionStateChangedAt = util.getTime();
 }
@@ -129,17 +166,44 @@ function beginIntroductionAfterDeviceSettle(now: number): void {
     return;
   }
 
-  sendIntroductionAttempt(now);
+  sendIdentityRequestForInitialization(now);
+}
+
+function sendIdentityRequestForInitialization(now: number): void {
+  // Mark pending before sending: hardware responses may arrive synchronously
+  // through Chataigne's MIDI callback path.
+  introductionState = 2;
+  introductionStateChangedAt = now;
+  logIdentityRequest();
+  sendIdentityRequest();
 }
 
 function sendIntroductionAttempt(now: number): void {
   // The controller may answer synchronously from another MIDI callback. Mark
   // the request pending before sending so a fast response can clear it.
-  introductionState = 2;
+  introductionState = 3;
   introductionStateChangedAt = now;
   introductionAttempts += 1;
-  logInitializationRequest(introductionAttempts);
+  logIntroductionRequest(introductionAttempts);
   sendIntroductionRequest();
+}
+
+function logIntroductionTimeoutWarning(): void {
+  if (identityResult == "APC mini mk2 reply") {
+    script.logWarning(
+      "APC Mini mkII identity succeeded, but Introduction did not respond. "
+      + "The Notes port or mismatched MIDI input and output ports are probably selected. "
+      + "Select APC mini mk2 Control for both MIDI devices. "
+      + "Incoming MIDI and LED output will continue, but initial fader positions may be unknown."
+    );
+    return;
+  }
+
+  script.logWarning(
+    "The selected MIDI device did not respond to APC Mini mkII Identity or Introduction. "
+    + "Verify that APC mini mk2 Control is selected for both MIDI devices. "
+    + "Incoming MIDI and LED output will continue, but initial fader positions may be unknown."
+  );
 }
 
 function completeDeviceInitialization(): void {

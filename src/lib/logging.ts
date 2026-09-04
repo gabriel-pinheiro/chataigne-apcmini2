@@ -76,21 +76,21 @@ function logUnrecognizedSysexInput(data: number[]): void {
 
 function logInvalidIntroductionResponse(byteCount: number): void {
   if (!interpretedInputLogControl.get()) return;
-  script.log("Initialization Response Invalid: " + byteCount + " payload bytes");
+  script.log("Introduction Response Invalid: " + byteCount + " payload bytes");
 }
 
 function logAmbiguousIntroductionResponse(willRetry: boolean): void {
   if (!interpretedInputLogControl.get()) return;
   if (willRetry) {
-    script.log("Initialization Response: all faders returned 127; retrying");
+    script.log("Introduction Response: all faders returned 127; retrying");
   } else {
-    script.log("Initialization Response: all faders returned 127; keeping last known values");
+    script.log("Introduction Response: all faders returned 127; keeping last known values");
   }
 }
 
 function logSuccessfulIntroductionResponse(values: number[]): void {
   if (!interpretedInputLogControl.get()) return;
-  var message = "Initialization Complete: ";
+  var message = "Introduction Complete: ";
   for (var index = 0; index < values.length; index += 1) {
     if (index > 0) message += ", ";
     message += faderLabel(index) + " = " + formatMidiValue(values[index]);
@@ -98,9 +98,32 @@ function logSuccessfulIntroductionResponse(values: number[]): void {
   script.log(message);
 }
 
-function logInitializationRequest(attempt: number): void {
+function logIdentityRequest(): void {
   if (!interpretedOutputLogControl.get()) return;
-  script.log("Initialization Request Sent: attempt " + attempt);
+  script.log("Identity Request Sent");
+}
+
+function logIdentityReply(data: number[], isApc: boolean): void {
+  if (!interpretedInputLogControl.get()) return;
+  if (!isApc) {
+    script.log(
+      "Identity Reply: manufacturer " + (data.length >= 5 ? data[4] : "unknown")
+      + ", product " + (data.length >= 6 ? data[5] : "unknown")
+    );
+    return;
+  }
+
+  var revision = data.length >= 12 ? formatByteRange(data, 8, 4) : "unavailable";
+  var deviceId = data.length >= 13 ? "" + data[12] : "unavailable";
+  script.log(
+    "Identity Reply: APC Mini mkII, software revision bytes [" + revision
+    + "], device ID " + deviceId
+  );
+}
+
+function logIntroductionRequest(attempt: number): void {
+  if (!interpretedOutputLogControl.get()) return;
+  script.log("Introduction Request Sent: attempt " + attempt);
 }
 
 function logPadLedOutput(note: number, rgb: number[]): void {
@@ -222,4 +245,14 @@ function formatHexByte(value: number): string {
 
 function formatRgbHex(rgb: number[]): string {
   return "#" + formatHexByte(rgb[0]) + formatHexByte(rgb[1]) + formatHexByte(rgb[2]);
+}
+
+function formatByteRange(values: number[], start: number, count: number): string {
+  var result = "";
+  var end = Math.min(values.length, start + count);
+  for (var index = start; index < end; index += 1) {
+    if (result != "") result += ", ";
+    result += values[index];
+  }
+  return result;
 }

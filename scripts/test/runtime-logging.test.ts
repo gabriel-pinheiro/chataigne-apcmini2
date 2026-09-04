@@ -102,10 +102,12 @@ test("logs handshake input as semantic summaries without per-fader duplicates", 
   ]);
 
   assert.deepEqual(logs, [
-    "Initialization Request Sent: attempt 1",
-    "Initialization Response: all faders returned 127; retrying",
-    "Initialization Request Sent: attempt 2",
-    "Initialization Complete: Fader 1 = 64 (50.4%), Fader 2 = 0 (0%), "
+    "Identity Request Sent",
+    "Identity Reply: APC Mini mkII, software revision bytes [0, 1, 0, 0], device ID 127",
+    "Introduction Request Sent: attempt 1",
+    "Introduction Response: all faders returned 127; retrying",
+    "Introduction Request Sent: attempt 2",
+    "Introduction Complete: Fader 1 = 64 (50.4%), Fader 2 = 0 (0%), "
       + "Fader 3 = 16 (12.6%), Fader 4 = 32 (25.2%), Fader 5 = 48 (37.8%), "
       + "Fader 6 = 80 (63%), Fader 7 = 96 (75.6%), Fader 8 = 112 (88.2%), "
       + "Master Fader = 127 (100%)",
@@ -129,7 +131,8 @@ test("logs outgoing handshake and MIDI Clock configuration", async () => {
 
   assert.deepEqual(logs, [
     "MIDI Clock Enabled: 120 BPM",
-    "Initialization Request Sent: attempt 1",
+    "Identity Request Sent",
+    "Introduction Request Sent: attempt 1",
     "MIDI Clock BPM Changed: 128",
     "MIDI Clock Disabled"
   ]);

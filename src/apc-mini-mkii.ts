@@ -82,6 +82,11 @@ function ccEvent(channel: number, number: number, value: number): void {
 }
 
 function sysExEvent(data: number[]): void {
+  if (isIdentityReply(data)) {
+    handleIdentityReply(data);
+    return;
+  }
+
   var mode = decodePadMode(data);
   if (mode != "") {
     setPadMode(mode);
