@@ -79,6 +79,15 @@ test("exposes opt-in interpreted logging controls", () => {
   assert.equal(output.default, false);
 });
 
+test("exposes a stable Full Resync command", () => {
+  const commands = moduleDefinition.commands;
+  assert.ok(commands !== null && !Array.isArray(commands) && typeof commands === "object");
+  assert.deepEqual(commands["Full Resync"], {
+    menu: "",
+    callback: "fullResync"
+  });
+});
+
 test("exposes a stable read-only pad mode status", () => {
   const status = statusValues();
   const padMode = status["Pad Mode"];

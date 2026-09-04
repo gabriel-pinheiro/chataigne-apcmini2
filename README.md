@@ -25,10 +25,31 @@ messages for pads, buttons, faders, modes, initialization, and MIDI Clock
 configuration. They are independent from Chataigne's raw MIDI logging toggles.
 Operational warnings remain enabled regardless of these settings.
 
+## Implemented output
+
+All 64 pad LEDs support Exact RGB output. Changes are sent immediately after
+the controller has initialized. A color's alpha is multiplied into its red,
+green, and blue components before it is sent.
+
+The module sends the complete current pad state after initialization, including
+after the initialization timeout. Disabled pads are explicitly sent as black,
+so reconnecting cannot leave stale LEDs on the controller. The `Full Resync`
+command can resend all 64 pads at any time after initialization; invoking it
+while disconnected or while initialization is pending produces a warning and
+is otherwise ignored.
+
+Chataigne exposes `Full Resync` in command and consequence choosers, not in the
+module inspector. After updating this module's `module.json`, use
+`File > Reload Custom Modules` and recreate the module instance, or restart
+Chataigne, so it rebuilds the cached command definition.
+
+Hardware Palette output is not implemented yet. Selecting Hardware Palette
+currently turns that pad black while preserving its configured color and mode,
+ready for palette support to be added without changing the parameter model.
+
 Hardware behavior and MIDI mappings are based on Akai's
 [user guide](https://cdn.inmusicbrands.com/akai/apc-mini-mkii/APC%20mini%20mk2%20-%20User%20Guide%20-%20v1.7.pdf)
 and [communication protocol](https://cdn.inmusicbrands.com/akai/attachments/APC%20mini%20mk2%20-%20Communication%20Protocol%20-%20v1.0.pdf).
-
 
 ## Pad modes
 

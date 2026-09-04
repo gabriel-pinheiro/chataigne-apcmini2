@@ -30,6 +30,13 @@ interface ChataignePressedValue extends ChataigneContainer {
   isPressed: ChataigneParameter<boolean>;
 }
 
+interface ChataignePadParameters extends ChataigneContainer {
+  ledEnabled: ChataigneParameter<boolean>;
+  colorMode: ChataigneEnumParameter;
+  color: ChataigneParameter<[red: number, green: number, blue: number, alpha: number]>;
+  paletteMode: ChataigneEnumParameter;
+}
+
 type PadColumn = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 type PadShortName<Row extends number> = `pad${Row}${PadColumn}`;
 type ChataignePadRow<Row extends number> = ChataigneContainer & {
@@ -45,6 +52,21 @@ interface ChataignePads extends ChataigneContainer {
   row6: ChataignePadRow<6>;
   row7: ChataignePadRow<7>;
   row8: ChataignePadRow<8>;
+}
+
+type ChataignePadParameterRow<Row extends number> = ChataigneContainer & {
+  [Pad in PadShortName<Row>]: ChataignePadParameters;
+};
+
+interface ChataignePadParameterRows extends ChataigneContainer {
+  row1: ChataignePadParameterRow<1>;
+  row2: ChataignePadParameterRow<2>;
+  row3: ChataignePadParameterRow<3>;
+  row4: ChataignePadParameterRow<4>;
+  row5: ChataignePadParameterRow<5>;
+  row6: ChataignePadParameterRow<6>;
+  row7: ChataignePadParameterRow<7>;
+  row8: ChataignePadParameterRow<8>;
 }
 
 type IndexedPressedValues<Prefix extends string> = ChataigneContainer & {
@@ -77,6 +99,7 @@ interface ChataigneLocal {
       logInterpretedInput: ChataigneParameter<boolean>;
       logInterpretedOutput: ChataigneParameter<boolean>;
     };
+    pads: ChataignePadParameterRows;
   };
   values: {
     pads: ChataignePads;

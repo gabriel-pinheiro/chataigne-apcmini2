@@ -26,6 +26,12 @@ export const moduleDefinition: Definition = {
     "usePitchForNoteNames",
     "passThrough"
   ],
+  commands: {
+    "Full Resync": {
+      menu: "",
+      callback: "fullResync"
+    }
+  },
   parameters: {
     Clock: container(
       {

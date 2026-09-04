@@ -17,6 +17,7 @@ export type RuntimeFunctions = {
   ccEvent(channel: number, number: number, value: number): void;
   sysExEvent(data: number[]): void;
   moduleParameterChanged(parameter: MockParameter<unknown>): void;
+  fullResync(): void;
   decodePadMode(data: number[]): string;
   decodeIntroductionFaders(data: number[]): number[];
   padLabel(note: number): string;
@@ -86,15 +87,31 @@ export async function createRuntime(options: RuntimeOptions = {}) {
 
   type PressedControl = MockContainer<{ isPressed: MockParameter<boolean> }>;
   type PadRow = MockContainer<Record<string, PressedControl>>;
+  type PadParameterControl = MockContainer<{
+    ledEnabled: MockParameter<boolean>;
+    colorMode: MockParameter<string>;
+    color: MockParameter<[number, number, number, number]>;
+    paletteMode: MockParameter<string>;
+  }>;
+  type PadParameterRow = MockContainer<Record<string, PadParameterControl>>;
   type FaderControl = MockContainer<{ position: MockParameter<number> }>;
 
   const pads: Record<string, PadRow> = {};
+  const padParameters: Record<string, PadParameterRow> = {};
   for (let row = 1; row <= 8; row += 1) {
     const rowControls: Record<string, PressedControl> = {};
+    const rowParameters: Record<string, PadParameterControl> = {};
     for (let column = 1; column <= 8; column += 1) {
       rowControls[`pad${row}${column}`] = container({ isPressed: parameter(false) });
+      rowParameters[`pad${row}${column}`] = container({
+        ledEnabled: parameter(false),
+        colorMode: parameter("rgb"),
+        color: parameter([1, 1, 1, 1]),
+        paletteMode: parameter("solid100")
+      });
     }
     pads[`row${row}`] = container(rowControls);
+    padParameters[`row${row}`] = container(rowParameters);
   }
 
   const trackButtons: Record<string, PressedControl> = {};
@@ -126,16 +143,18 @@ export async function createRuntime(options: RuntimeOptions = {}) {
     devices,
     isConnected,
     clock: container({ sendClock, bpm }),
-    logging: container({ logInterpretedInput, logInterpretedOutput })
+    logging: container({ logInterpretedInput, logInterpretedOutput }),
+    pads: container(padParameters)
   });
   let runtime: RuntimeFunctions;
   const context = vm.createContext({
     local: {
       parameters,
       values,
-      sendSysex: (...message: number[]) => {
+      sendSysex: (...parts: Array<number | number[]>) => {
+        const message = parts.flatMap((part) => typeof part === "number" ? [part] : part);
         sysexMessages.push(message);
-        if (options.introductionResponseOnSend) {
+        if (options.introductionResponseOnSend && message[3] === 0x60) {
           runtime.sysExEvent(options.introductionResponseOnSend);
         }
       }
@@ -161,6 +180,7 @@ export async function createRuntime(options: RuntimeOptions = {}) {
     isConnected,
     padMode,
     pads,
+    padParameters,
     trackButtons,
     sceneButtons,
     shift: shift.isPressed,

@@ -43,6 +43,7 @@ function handleIntroductionResponse(data: number[]): void {
       "APC Mini mkII returned 127 for every fader during initialization. "
       + "Keeping the last known positions until the faders are moved."
     );
+    completePadOutputInitialization();
     return;
   }
 
@@ -51,6 +52,7 @@ function handleIntroductionResponse(data: number[]): void {
   for (var index = 0; index < faderValues.length; index += 1) {
     setFaderPosition(index, faderValues[index]);
   }
+  completePadOutputInitialization();
 }
 
 function handleModuleParameterChange(parameter: ChataigneParameter<unknown>): void {
@@ -64,6 +66,7 @@ function handleModuleParameterChange(parameter: ChataigneParameter<unknown>): vo
       resetPressedValues();
       setPadMode("unknown");
       introductionState = 0;
+      markPadOutputInitializing();
       return;
     }
     scheduleIntroduction();
@@ -93,6 +96,7 @@ function updateIntroduction(): void {
       "APC Mini mkII did not respond to initialization. "
       + "Incoming MIDI will continue, but initial fader positions may be unknown."
     );
+    completePadOutputInitialization();
   }
 }
 
@@ -110,6 +114,7 @@ function handleDeviceChange(): void {
 }
 
 function scheduleIntroduction(): void {
+  markPadOutputInitializing();
   if (!connectionControl.get()
     || selectedDevice(0) == ""
     || selectedDevice(1) == "") {

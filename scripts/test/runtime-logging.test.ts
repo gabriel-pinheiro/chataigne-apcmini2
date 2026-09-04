@@ -108,7 +108,8 @@ test("logs handshake input as semantic summaries without per-fader duplicates", 
     "Initialization Complete: Fader 1 = 64 (50.4%), Fader 2 = 0 (0%), "
       + "Fader 3 = 16 (12.6%), Fader 4 = 32 (25.2%), Fader 5 = 48 (37.8%), "
       + "Fader 6 = 80 (63%), Fader 7 = 96 (75.6%), Fader 8 = 112 (88.2%), "
-      + "Master Fader = 127 (100%)"
+      + "Master Fader = 127 (100%)",
+    "Full Resync Sent: 64 pad LEDs"
   ]);
 });
 

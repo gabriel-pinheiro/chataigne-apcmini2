@@ -103,6 +103,19 @@ function logInitializationRequest(attempt: number): void {
   script.log("Initialization Request Sent: attempt " + attempt);
 }
 
+function logPadLedOutput(note: number, rgb: number[]): void {
+  if (!interpretedOutputLogControl.get()) return;
+  script.log(
+    "Pad LED Updated: " + padLabel(note) + " = #"
+    + formatHexByte(rgb[0]) + formatHexByte(rgb[1]) + formatHexByte(rgb[2])
+  );
+}
+
+function logFullPadResyncOutput(): void {
+  if (!interpretedOutputLogControl.get()) return;
+  script.log("Full Resync Sent: 64 pad LEDs");
+}
+
 function handleLoggingParameterChange(parameter: ChataigneParameter<unknown>): void {
   if (parameter.is(interpretedInputLogControl)) {
     if (interpretedInputLogControl.get()) resetFaderLogHistory();
@@ -177,4 +190,9 @@ function formatMidiValue(value: number): string {
   var percentage = "" + percentageWhole;
   if (percentageFraction != 0) percentage += "." + percentageFraction;
   return value + " (" + percentage + "%)";
+}
+
+function formatHexByte(value: number): string {
+  var digits = "0123456789ABCDEF";
+  return digits.charAt(Math.floor(value / 16)) + digits.charAt(value % 16);
 }
