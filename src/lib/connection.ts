@@ -43,7 +43,7 @@ function handleIntroductionResponse(data: number[]): void {
       "APC Mini mkII returned 127 for every fader during initialization. "
       + "Keeping the last known positions until the faders are moved."
     );
-    completePadOutputInitialization();
+    completeDeviceInitialization();
     return;
   }
 
@@ -52,7 +52,7 @@ function handleIntroductionResponse(data: number[]): void {
   for (var index = 0; index < faderValues.length; index += 1) {
     setFaderPosition(index, faderValues[index]);
   }
-  completePadOutputInitialization();
+  completeDeviceInitialization();
 }
 
 function handleModuleParameterChange(parameter: ChataigneParameter<unknown>): void {
@@ -67,6 +67,7 @@ function handleModuleParameterChange(parameter: ChataigneParameter<unknown>): vo
       setPadMode("unknown");
       introductionState = 0;
       markPadOutputInitializing();
+      markMidiClockInitializing();
       return;
     }
     scheduleIntroduction();
@@ -96,7 +97,7 @@ function updateIntroduction(): void {
       "APC Mini mkII did not respond to initialization. "
       + "Incoming MIDI will continue, but initial fader positions may be unknown."
     );
-    completePadOutputInitialization();
+    completeDeviceInitialization();
   }
 }
 
@@ -115,6 +116,7 @@ function handleDeviceChange(): void {
 
 function scheduleIntroduction(): void {
   markPadOutputInitializing();
+  markMidiClockInitializing();
   if (!connectionControl.get()
     || selectedDevice(0) == ""
     || selectedDevice(1) == "") {
@@ -124,6 +126,11 @@ function scheduleIntroduction(): void {
   introductionAttempts = 0;
   introductionState = 1;
   introductionStateChangedAt = util.getTime();
+}
+
+function completeDeviceInitialization(): void {
+  completePadOutputInitialization();
+  completeMidiClockInitialization();
 }
 
 function isAmbiguousFaderSnapshot(values: number[]): boolean {

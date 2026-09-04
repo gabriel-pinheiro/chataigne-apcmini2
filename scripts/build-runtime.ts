@@ -6,6 +6,7 @@ const projectRoot = new URL("../", import.meta.url);
 const sourceFiles = [
   "src/lib/protocol.ts",
   "src/lib/controls.ts",
+  "src/lib/clock.ts",
   "src/lib/logging.ts",
   "src/lib/palette.ts",
   "src/lib/pad-controls.ts",

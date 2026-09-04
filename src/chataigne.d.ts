@@ -87,14 +87,16 @@ type ChataigneFaders = ChataigneContainer & {
 interface ChataigneMidiDeviceParameter
   extends ChataigneParameter<[inputId: string, outputId: string]> {}
 
+interface ChataigneClockControls extends ChataigneContainer {
+  sendClock: ChataigneParameter<boolean>;
+  bpm: ChataigneParameter<number>;
+}
+
 interface ChataigneLocal {
   parameters: {
     devices: ChataigneMidiDeviceParameter;
     isConnected: ChataigneParameter<boolean>;
-    clock: {
-      sendClock: ChataigneParameter<boolean>;
-      bpm: ChataigneParameter<number>;
-    };
+    clock: ChataigneClockControls;
     logging: {
       logInterpretedInput: ChataigneParameter<boolean>;
       logInterpretedOutput: ChataigneParameter<boolean>;
@@ -102,6 +104,7 @@ interface ChataigneLocal {
     pads: ChataignePadParameterRows;
   };
   values: {
+    tempo: ChataigneClockControls;
     pads: ChataignePads;
     buttons: {
       trackButtons: IndexedPressedValues<"track">;

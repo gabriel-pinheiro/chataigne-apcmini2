@@ -11,6 +11,7 @@
     "chataigne.d.ts",
     "lib/protocol.ts",
     "lib/controls.ts",
+    "lib/clock.ts",
     "lib/logging.ts",
     "lib/palette.ts",
     "lib/pad-controls.ts",

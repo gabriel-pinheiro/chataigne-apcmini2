@@ -2,10 +2,13 @@ import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 
 export type MockParameter<T> = {
+  attributes: Record<string, boolean | number | string>;
+  setHistory: T[];
   get(): T;
   getControlAddress(): string;
   is(other: MockParameter<unknown>): boolean;
   set(value: T): void;
+  setAttribute(name: string, value: boolean | number | string): void;
   setData(value: string): void;
 };
 
@@ -32,14 +35,22 @@ let nextParameterId = 0;
 export function parameter<T>(initialValue: T): MockParameter<T> {
   let value = initialValue;
   const controlAddress = `/test/parameter${nextParameterId}`;
+  const attributes: Record<string, boolean | number | string> = {};
+  const setHistory: T[] = [];
   nextParameterId += 1;
 
   return {
+    attributes,
+    setHistory,
     get: () => value,
     getControlAddress: () => controlAddress,
     is: (other) => other.getControlAddress() === controlAddress,
     set: (nextValue) => {
       value = nextValue;
+      setHistory.push(nextValue);
+    },
+    setAttribute: (name, attributeValue) => {
+      attributes[name] = attributeValue;
     },
     setData: (nextValue) => {
       value = nextValue as T;
@@ -65,6 +76,8 @@ type RuntimeOptions = {
   logInterpretedOutput?: boolean;
   sendClock?: boolean;
   bpm?: number;
+  inheritedSendClock?: boolean;
+  inheritedBpm?: number;
 };
 
 export async function createRuntime(options: RuntimeOptions = {}) {
@@ -88,6 +101,8 @@ export async function createRuntime(options: RuntimeOptions = {}) {
   const logInterpretedOutput = parameter(options.logInterpretedOutput ?? false);
   const sendClock = parameter(options.sendClock ?? true);
   const bpm = parameter(options.bpm ?? 120);
+  const midiSendClock = parameter(options.inheritedSendClock ?? false);
+  const midiBpm = parameter(options.inheritedBpm ?? 0);
 
   type PressedControl = MockContainer<{ isPressed: MockParameter<boolean> }>;
   type PadRow = MockContainer<Record<string, PressedControl>>;
@@ -134,6 +149,7 @@ export async function createRuntime(options: RuntimeOptions = {}) {
   const padMode = parameter("unknown");
   const shift = container({ isPressed: parameter(false) });
   const values = container({
+    tempo: container({ sendClock: midiSendClock, bpm: midiBpm }),
     status: container({ padMode }),
     pads: container(pads),
     buttons: container({
@@ -200,6 +216,8 @@ export async function createRuntime(options: RuntimeOptions = {}) {
     logInterpretedOutput,
     sendClock,
     bpm,
+    midiSendClock,
+    midiBpm,
     enableLog,
     getUpdateRate: () => updateRate,
     advanceTime: (seconds: number) => {

@@ -264,6 +264,50 @@ function resetPressedValues() {
   }
   setButtonPressed(shiftButtonNote, false);
 }
+var moduleClockControls;
+var midiClockControls;
+var midiClockInitialized = false;
+var midiClockReady = false;
+function initializeClock() {
+  moduleClockControls = local.parameters.clock;
+  midiClockControls = local.values.tempo;
+  midiClockControls.sendClock.setAttribute("readOnly", true);
+  midiClockControls.bpm.setAttribute("readOnly", true);
+  midiClockInitialized = true;
+  midiClockReady = false;
+  midiClockControls.sendClock.set(false);
+  midiClockControls.bpm.set(moduleClockControls.bpm.get());
+}
+function handleClockParameterChange(parameter) {
+  if (parameter.is(moduleClockControls.sendClock) || parameter.is(moduleClockControls.bpm)) {
+    synchronizeMidiClock();
+  }
+}
+function synchronizeMidiClock() {
+  if (!midiClockInitialized) return;
+  midiClockControls.bpm.set(moduleClockControls.bpm.get());
+  if (midiClockReady) {
+    midiClockControls.sendClock.set(moduleClockControls.sendClock.get());
+  } else if (midiClockControls.sendClock.get()) {
+    midiClockControls.sendClock.set(false);
+  }
+}
+function markMidiClockInitializing() {
+  if (!midiClockInitialized) return;
+  midiClockReady = false;
+  if (midiClockControls.sendClock.get()) {
+    midiClockControls.sendClock.set(false);
+  }
+}
+function completeMidiClockInitialization() {
+  if (!midiClockInitialized || midiClockReady) return;
+  midiClockReady = true;
+  if (midiClockControls.sendClock.get()) {
+    midiClockControls.sendClock.set(false);
+  }
+  midiClockControls.bpm.set(moduleClockControls.bpm.get());
+  midiClockControls.sendClock.set(moduleClockControls.sendClock.get());
+}
 var interpretedInputLogControl;
 var interpretedOutputLogControl;
 var sendClockControl;
@@ -917,7 +961,7 @@ function handleIntroductionResponse(data) {
     script.logWarning(
       "APC Mini mkII returned 127 for every fader during initialization. Keeping the last known positions until the faders are moved."
     );
-    completePadOutputInitialization();
+    completeDeviceInitialization();
     return;
   }
   introductionState = 0;
@@ -925,7 +969,7 @@ function handleIntroductionResponse(data) {
   for (var index = 0; index < faderValues.length; index += 1) {
     setFaderPosition(index, faderValues[index]);
   }
-  completePadOutputInitialization();
+  completeDeviceInitialization();
 }
 function handleModuleParameterChange(parameter) {
   if (sameControl(parameter, deviceControls)) {
@@ -938,6 +982,7 @@ function handleModuleParameterChange(parameter) {
       setPadMode("unknown");
       introductionState = 0;
       markPadOutputInitializing();
+      markMidiClockInitializing();
       return;
     }
     scheduleIntroduction();
@@ -959,7 +1004,7 @@ function updateIntroduction() {
     script.logWarning(
       "APC Mini mkII did not respond to initialization. Incoming MIDI will continue, but initial fader positions may be unknown."
     );
-    completePadOutputInitialization();
+    completeDeviceInitialization();
   }
 }
 function handleDeviceChange() {
@@ -974,6 +1019,7 @@ function handleDeviceChange() {
 }
 function scheduleIntroduction() {
   markPadOutputInitializing();
+  markMidiClockInitializing();
   if (!connectionControl.get() || selectedDevice(0) == "" || selectedDevice(1) == "") {
     introductionState = 0;
     return;
@@ -981,6 +1027,10 @@ function scheduleIntroduction() {
   introductionAttempts = 0;
   introductionState = 1;
   introductionStateChangedAt = util.getTime();
+}
+function completeDeviceInitialization() {
+  completePadOutputInitialization();
+  completeMidiClockInitialization();
 }
 function isAmbiguousFaderSnapshot(values) {
   if (values.length != 9) return false;
@@ -1020,6 +1070,7 @@ function init() {
   initializePadOutput();
   initializePadMode();
   initializeConnection();
+  initializeClock();
   logCurrentClockState();
 }
 function noteOnEvent(channel, pitch, velocity) {
@@ -1099,6 +1150,7 @@ function sysExEvent(data) {
   }
 }
 function moduleParameterChanged(parameter) {
+  handleClockParameterChange(parameter);
   handleLoggingParameterChange(parameter);
   handlePadOutputParameterChange(parameter);
   handleModuleParameterChange(parameter);

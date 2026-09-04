@@ -5,6 +5,7 @@ function init(): void {
   initializePadOutput();
   initializePadMode();
   initializeConnection();
+  initializeClock();
   logCurrentClockState();
 }
 
@@ -96,6 +97,7 @@ function sysExEvent(data: number[]): void {
 }
 
 function moduleParameterChanged(parameter: ChataigneParameter<unknown>): void {
+  handleClockParameterChange(parameter);
   handleLoggingParameterChange(parameter);
   handlePadOutputParameterChange(parameter);
   handleModuleParameterChange(parameter);
