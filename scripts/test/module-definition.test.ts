@@ -100,7 +100,8 @@ test("exposes a stable read-only pad mode status", () => {
     Unknown: "unknown",
     Session: "session",
     Note: "note",
-    Drum: "drum"
+    Drum: "drum",
+    "Note Edit": "node_edit"
   });
 });
 

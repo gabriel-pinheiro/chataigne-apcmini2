@@ -20,6 +20,12 @@ test("tracks explicit pad-mode SysEx and warns once per unsupported transition",
   assert.equal(padMode.get(), "note");
   assert.equal(warnings.length, 2);
   assert.match(warnings[1], /Note Mode is not supported/);
+
+  runtime.sysExEvent(modeMessage(3));
+  runtime.sysExEvent(modeMessage(3));
+  assert.equal(padMode.get(), "node_edit");
+  assert.equal(warnings.length, 3);
+  assert.match(warnings[2], /Note Edit Mode is not supported/);
 });
 
 test("uses Drum MIDI as a fallback without treating it as Session input", async () => {

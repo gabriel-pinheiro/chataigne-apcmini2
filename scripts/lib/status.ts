@@ -10,7 +10,8 @@ export function statusValues(): Definition {
         Unknown: "unknown",
         Session: "session",
         Note: "note",
-        Drum: "drum"
+        Drum: "drum",
+        "Note Edit": "node_edit"
       },
       readOnly: true,
       description: "Currently detected hardware pad mode. Only Session Mode is supported."

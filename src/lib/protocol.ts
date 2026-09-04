@@ -1,4 +1,4 @@
-type PadMode = "unknown" | "session" | "note" | "drum";
+type PadMode = "unknown" | "session" | "note" | "drum" | "node_edit";
 
 // Intentionally use loose numeric equality in runtime code. JUCE parses script
 // integer literals as int64, while Chataigne supplies MIDI values as int vars;
@@ -57,6 +57,7 @@ function decodePadMode(data: number[]): PadMode | "" {
   if (mode == 0) return "session";
   if (mode == 1) return "note";
   if (mode == 2) return "drum";
+  if (mode == 3) return "node_edit";
   return "";
 }
 

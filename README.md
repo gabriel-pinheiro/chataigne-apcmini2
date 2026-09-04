@@ -69,7 +69,7 @@ and [communication protocol](https://cdn.inmusicbrands.com/akai/attachments/APC%
 
 ## Pad modes
 
-The APC Mini mkII has three hardware pad modes:
+The APC Mini mkII has four hardware pad modes:
 
 - **Session Mode** is the default 8x8 control-surface layout. This is the only
   pad mode supported by this module.
@@ -77,9 +77,11 @@ The APC Mini mkII has three hardware pad modes:
   musical notes on MIDI channel 10 and is not currently supported.
 - **Note Mode** is toggled with Shift + Scene 7. It sends musical notes through
   the separate `APC mini mk2 Notes` MIDI port and is not currently supported.
+- **Note Edit Mode** is entered by holding Shift and Scene 7 while in Note Mode.
+  It is used to edit Note Mode settings and is not currently supported.
 
-If you enter Drum or Note Mode accidentally, press the same Shift combination
-again to return to Session Mode.
+If you enter Drum, Note, or Note Edit Mode accidentally, use the controller's
+mode shortcut to return to Session Mode.
 
 The detected mode is available at `Values > Status > Pad Mode`. Until the
 controller reports its mode or sends an identifiable pad event, it is shown as
