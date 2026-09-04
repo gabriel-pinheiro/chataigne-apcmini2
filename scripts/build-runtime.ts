@@ -7,6 +7,8 @@ const sourceFiles = [
   "src/lib/protocol.ts",
   "src/lib/controls.ts",
   "src/lib/logging.ts",
+  "src/lib/palette.ts",
+  "src/lib/pad-controls.ts",
   "src/lib/pad-output.ts",
   "src/lib/mode.ts",
   "src/lib/connection.ts",

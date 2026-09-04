@@ -113,6 +113,7 @@ interface ChataigneLocal {
       padMode: ChataigneEnumParameter;
     };
   };
+  sendNoteOn(channel: number, pitch: number, velocity: number): void;
   sendSysex(...data: Array<number | number[] | string | boolean>): void;
 }
 

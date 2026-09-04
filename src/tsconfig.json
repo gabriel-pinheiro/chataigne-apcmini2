@@ -12,6 +12,8 @@
     "lib/protocol.ts",
     "lib/controls.ts",
     "lib/logging.ts",
+    "lib/palette.ts",
+    "lib/pad-controls.ts",
     "lib/pad-output.ts",
     "lib/mode.ts",
     "lib/connection.ts",

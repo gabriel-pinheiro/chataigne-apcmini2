@@ -105,10 +105,26 @@ function logInitializationRequest(attempt: number): void {
 
 function logPadLedOutput(note: number, rgb: number[]): void {
   if (!interpretedOutputLogControl.get()) return;
+  script.log("Pad LED Updated: " + padLabel(note) + " = " + formatRgbHex(rgb));
+}
+
+function logPalettePadLedOutput(
+  note: number,
+  paletteIndex: number,
+  selectedRgb: number[],
+  requestedRgb: number[]
+): void {
+  if (!interpretedOutputLogControl.get()) return;
   script.log(
-    "Pad LED Updated: " + padLabel(note) + " = #"
-    + formatHexByte(rgb[0]) + formatHexByte(rgb[1]) + formatHexByte(rgb[2])
+    "Pad LED Updated: " + padLabel(note)
+    + " = Palette " + paletteIndex + " " + formatRgbHex(selectedRgb)
+    + " (requested " + formatRgbHex(requestedRgb) + ")"
   );
+}
+
+function logPadLedDisabled(note: number): void {
+  if (!interpretedOutputLogControl.get()) return;
+  script.log("Pad LED Disabled: " + padLabel(note));
 }
 
 function logFullPadResyncOutput(): void {
@@ -195,4 +211,8 @@ function formatMidiValue(value: number): string {
 function formatHexByte(value: number): string {
   var digits = "0123456789ABCDEF";
   return digits.charAt(Math.floor(value / 16)) + digits.charAt(value % 16);
+}
+
+function formatRgbHex(rgb: number[]): string {
+  return "#" + formatHexByte(rgb[0]) + formatHexByte(rgb[1]) + formatHexByte(rgb[2]);
 }

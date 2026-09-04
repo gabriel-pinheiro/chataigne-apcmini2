@@ -41,7 +41,7 @@ function padParameter(row: number, column: number): Definition {
         "Exact RGB": "rgb",
         "Hardware Palette": "palette"
       },
-      description: "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+      description: "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
     },
     Color: {
       type: "Color",

@@ -350,9 +350,17 @@ function logInitializationRequest(attempt) {
 }
 function logPadLedOutput(note, rgb) {
   if (!interpretedOutputLogControl.get()) return;
+  script.log("Pad LED Updated: " + padLabel(note) + " = " + formatRgbHex(rgb));
+}
+function logPalettePadLedOutput(note, paletteIndex, selectedRgb, requestedRgb) {
+  if (!interpretedOutputLogControl.get()) return;
   script.log(
-    "Pad LED Updated: " + padLabel(note) + " = #" + formatHexByte(rgb[0]) + formatHexByte(rgb[1]) + formatHexByte(rgb[2])
+    "Pad LED Updated: " + padLabel(note) + " = Palette " + paletteIndex + " " + formatRgbHex(selectedRgb) + " (requested " + formatRgbHex(requestedRgb) + ")"
   );
+}
+function logPadLedDisabled(note) {
+  if (!interpretedOutputLogControl.get()) return;
+  script.log("Pad LED Disabled: " + padLabel(note));
 }
 function logFullPadResyncOutput() {
   if (!interpretedOutputLogControl.get()) return;
@@ -424,90 +432,273 @@ function formatHexByte(value) {
   var digits = "0123456789ABCDEF";
   return digits.charAt(Math.floor(value / 16)) + digits.charAt(value % 16);
 }
+function formatRgbHex(rgb) {
+  return "#" + formatHexByte(rgb[0]) + formatHexByte(rgb[1]) + formatHexByte(rgb[2]);
+}
+var hardwarePaletteColors = [
+  0,
+  1973790,
+  8355711,
+  16777215,
+  16731212,
+  16711680,
+  5832704,
+  1638400,
+  16760172,
+  16733184,
+  5840128,
+  2562816,
+  16777036,
+  16776960,
+  5855488,
+  1644800,
+  8978252,
+  5570304,
+  1923328,
+  1321728,
+  5046092,
+  65280,
+  22784,
+  6400,
+  5046110,
+  65305,
+  22797,
+  6402,
+  5046152,
+  65365,
+  22813,
+  7954,
+  5046199,
+  65433,
+  22837,
+  6418,
+  5030911,
+  43519,
+  16722,
+  4121,
+  5015807,
+  22015,
+  7513,
+  2073,
+  5000447,
+  255,
+  89,
+  25,
+  8867071,
+  5505279,
+  1638500,
+  983088,
+  16731391,
+  16711935,
+  5832793,
+  1638425,
+  16731271,
+  16711764,
+  5832733,
+  2228243,
+  16717056,
+  10040576,
+  7950592,
+  4416512,
+  211200,
+  22325,
+  21631,
+  255,
+  17743,
+  2425036,
+  8355711,
+  2105376,
+  16711680,
+  12451629,
+  11529478,
+  6618889,
+  1084160,
+  65415,
+  43519,
+  11007,
+  4129023,
+  7995647,
+  11672189,
+  4202752,
+  16730624,
+  8970502,
+  7536405,
+  65280,
+  3931942,
+  5898097,
+  3735500,
+  5999359,
+  3232198,
+  8880105,
+  13835775,
+  16711773,
+  16744192,
+  12169216,
+  9502464,
+  8609031,
+  3746560,
+  1330192,
+  872504,
+  1381674,
+  1450074,
+  6896668,
+  11010058,
+  14569789,
+  14182940,
+  16769318,
+  10412335,
+  6796559,
+  1973808,
+  14483307,
+  8454077,
+  10131967,
+  9332479,
+  4210752,
+  7697781,
+  14745599,
+  10485760,
+  3473408,
+  1757184,
+  475648,
+  12169216,
+  4141312,
+  11755264,
+  4920578
+];
+function nearestHardwarePaletteIndex(rgb) {
+  var closestIndex = 0;
+  var closestDistance = -1;
+  for (var index = 0; index < hardwarePaletteColors.length; index += 1) {
+    var paletteRgb = hardwarePaletteRgb(index);
+    var redDifference = rgb[0] - paletteRgb[0];
+    var greenDifference = rgb[1] - paletteRgb[1];
+    var blueDifference = rgb[2] - paletteRgb[2];
+    var distance = redDifference * redDifference + greenDifference * greenDifference + blueDifference * blueDifference;
+    if (closestDistance < 0 || distance < closestDistance) {
+      closestDistance = distance;
+      closestIndex = index;
+    }
+  }
+  return closestIndex;
+}
+function hardwarePaletteRgb(index) {
+  var color = hardwarePaletteColors[index];
+  return [
+    Math.floor(color / 65536) % 256,
+    Math.floor(color / 256) % 256,
+    color % 256
+  ];
+}
+function visitPadControls(operation) {
+  handlePadControl(operation, 56, local.parameters.pads.row1.pad11);
+  handlePadControl(operation, 57, local.parameters.pads.row1.pad12);
+  handlePadControl(operation, 58, local.parameters.pads.row1.pad13);
+  handlePadControl(operation, 59, local.parameters.pads.row1.pad14);
+  handlePadControl(operation, 60, local.parameters.pads.row1.pad15);
+  handlePadControl(operation, 61, local.parameters.pads.row1.pad16);
+  handlePadControl(operation, 62, local.parameters.pads.row1.pad17);
+  handlePadControl(operation, 63, local.parameters.pads.row1.pad18);
+  handlePadControl(operation, 48, local.parameters.pads.row2.pad21);
+  handlePadControl(operation, 49, local.parameters.pads.row2.pad22);
+  handlePadControl(operation, 50, local.parameters.pads.row2.pad23);
+  handlePadControl(operation, 51, local.parameters.pads.row2.pad24);
+  handlePadControl(operation, 52, local.parameters.pads.row2.pad25);
+  handlePadControl(operation, 53, local.parameters.pads.row2.pad26);
+  handlePadControl(operation, 54, local.parameters.pads.row2.pad27);
+  handlePadControl(operation, 55, local.parameters.pads.row2.pad28);
+  handlePadControl(operation, 40, local.parameters.pads.row3.pad31);
+  handlePadControl(operation, 41, local.parameters.pads.row3.pad32);
+  handlePadControl(operation, 42, local.parameters.pads.row3.pad33);
+  handlePadControl(operation, 43, local.parameters.pads.row3.pad34);
+  handlePadControl(operation, 44, local.parameters.pads.row3.pad35);
+  handlePadControl(operation, 45, local.parameters.pads.row3.pad36);
+  handlePadControl(operation, 46, local.parameters.pads.row3.pad37);
+  handlePadControl(operation, 47, local.parameters.pads.row3.pad38);
+  handlePadControl(operation, 32, local.parameters.pads.row4.pad41);
+  handlePadControl(operation, 33, local.parameters.pads.row4.pad42);
+  handlePadControl(operation, 34, local.parameters.pads.row4.pad43);
+  handlePadControl(operation, 35, local.parameters.pads.row4.pad44);
+  handlePadControl(operation, 36, local.parameters.pads.row4.pad45);
+  handlePadControl(operation, 37, local.parameters.pads.row4.pad46);
+  handlePadControl(operation, 38, local.parameters.pads.row4.pad47);
+  handlePadControl(operation, 39, local.parameters.pads.row4.pad48);
+  handlePadControl(operation, 24, local.parameters.pads.row5.pad51);
+  handlePadControl(operation, 25, local.parameters.pads.row5.pad52);
+  handlePadControl(operation, 26, local.parameters.pads.row5.pad53);
+  handlePadControl(operation, 27, local.parameters.pads.row5.pad54);
+  handlePadControl(operation, 28, local.parameters.pads.row5.pad55);
+  handlePadControl(operation, 29, local.parameters.pads.row5.pad56);
+  handlePadControl(operation, 30, local.parameters.pads.row5.pad57);
+  handlePadControl(operation, 31, local.parameters.pads.row5.pad58);
+  handlePadControl(operation, 16, local.parameters.pads.row6.pad61);
+  handlePadControl(operation, 17, local.parameters.pads.row6.pad62);
+  handlePadControl(operation, 18, local.parameters.pads.row6.pad63);
+  handlePadControl(operation, 19, local.parameters.pads.row6.pad64);
+  handlePadControl(operation, 20, local.parameters.pads.row6.pad65);
+  handlePadControl(operation, 21, local.parameters.pads.row6.pad66);
+  handlePadControl(operation, 22, local.parameters.pads.row6.pad67);
+  handlePadControl(operation, 23, local.parameters.pads.row6.pad68);
+  handlePadControl(operation, 8, local.parameters.pads.row7.pad71);
+  handlePadControl(operation, 9, local.parameters.pads.row7.pad72);
+  handlePadControl(operation, 10, local.parameters.pads.row7.pad73);
+  handlePadControl(operation, 11, local.parameters.pads.row7.pad74);
+  handlePadControl(operation, 12, local.parameters.pads.row7.pad75);
+  handlePadControl(operation, 13, local.parameters.pads.row7.pad76);
+  handlePadControl(operation, 14, local.parameters.pads.row7.pad77);
+  handlePadControl(operation, 15, local.parameters.pads.row7.pad78);
+  handlePadControl(operation, 0, local.parameters.pads.row8.pad81);
+  handlePadControl(operation, 1, local.parameters.pads.row8.pad82);
+  handlePadControl(operation, 2, local.parameters.pads.row8.pad83);
+  handlePadControl(operation, 3, local.parameters.pads.row8.pad84);
+  handlePadControl(operation, 4, local.parameters.pads.row8.pad85);
+  handlePadControl(operation, 5, local.parameters.pads.row8.pad86);
+  handlePadControl(operation, 6, local.parameters.pads.row8.pad87);
+  handlePadControl(operation, 7, local.parameters.pads.row8.pad88);
+}
 var padLedEnabledControls = [];
 var padColorModeControls = [];
 var padColorControls = [];
+var padPaletteModeControls = [];
 var padOutputReady = false;
+var registerPadControlOperation = 0;
+var fullResyncPadControlOperation = 1;
+var hardwarePaletteSolidChannel = 7;
+var fullResyncExactMessage = [];
 function initializePadOutput() {
-  registerPadOutput(56, local.parameters.pads.row1.pad11);
-  registerPadOutput(57, local.parameters.pads.row1.pad12);
-  registerPadOutput(58, local.parameters.pads.row1.pad13);
-  registerPadOutput(59, local.parameters.pads.row1.pad14);
-  registerPadOutput(60, local.parameters.pads.row1.pad15);
-  registerPadOutput(61, local.parameters.pads.row1.pad16);
-  registerPadOutput(62, local.parameters.pads.row1.pad17);
-  registerPadOutput(63, local.parameters.pads.row1.pad18);
-  registerPadOutput(48, local.parameters.pads.row2.pad21);
-  registerPadOutput(49, local.parameters.pads.row2.pad22);
-  registerPadOutput(50, local.parameters.pads.row2.pad23);
-  registerPadOutput(51, local.parameters.pads.row2.pad24);
-  registerPadOutput(52, local.parameters.pads.row2.pad25);
-  registerPadOutput(53, local.parameters.pads.row2.pad26);
-  registerPadOutput(54, local.parameters.pads.row2.pad27);
-  registerPadOutput(55, local.parameters.pads.row2.pad28);
-  registerPadOutput(40, local.parameters.pads.row3.pad31);
-  registerPadOutput(41, local.parameters.pads.row3.pad32);
-  registerPadOutput(42, local.parameters.pads.row3.pad33);
-  registerPadOutput(43, local.parameters.pads.row3.pad34);
-  registerPadOutput(44, local.parameters.pads.row3.pad35);
-  registerPadOutput(45, local.parameters.pads.row3.pad36);
-  registerPadOutput(46, local.parameters.pads.row3.pad37);
-  registerPadOutput(47, local.parameters.pads.row3.pad38);
-  registerPadOutput(32, local.parameters.pads.row4.pad41);
-  registerPadOutput(33, local.parameters.pads.row4.pad42);
-  registerPadOutput(34, local.parameters.pads.row4.pad43);
-  registerPadOutput(35, local.parameters.pads.row4.pad44);
-  registerPadOutput(36, local.parameters.pads.row4.pad45);
-  registerPadOutput(37, local.parameters.pads.row4.pad46);
-  registerPadOutput(38, local.parameters.pads.row4.pad47);
-  registerPadOutput(39, local.parameters.pads.row4.pad48);
-  registerPadOutput(24, local.parameters.pads.row5.pad51);
-  registerPadOutput(25, local.parameters.pads.row5.pad52);
-  registerPadOutput(26, local.parameters.pads.row5.pad53);
-  registerPadOutput(27, local.parameters.pads.row5.pad54);
-  registerPadOutput(28, local.parameters.pads.row5.pad55);
-  registerPadOutput(29, local.parameters.pads.row5.pad56);
-  registerPadOutput(30, local.parameters.pads.row5.pad57);
-  registerPadOutput(31, local.parameters.pads.row5.pad58);
-  registerPadOutput(16, local.parameters.pads.row6.pad61);
-  registerPadOutput(17, local.parameters.pads.row6.pad62);
-  registerPadOutput(18, local.parameters.pads.row6.pad63);
-  registerPadOutput(19, local.parameters.pads.row6.pad64);
-  registerPadOutput(20, local.parameters.pads.row6.pad65);
-  registerPadOutput(21, local.parameters.pads.row6.pad66);
-  registerPadOutput(22, local.parameters.pads.row6.pad67);
-  registerPadOutput(23, local.parameters.pads.row6.pad68);
-  registerPadOutput(8, local.parameters.pads.row7.pad71);
-  registerPadOutput(9, local.parameters.pads.row7.pad72);
-  registerPadOutput(10, local.parameters.pads.row7.pad73);
-  registerPadOutput(11, local.parameters.pads.row7.pad74);
-  registerPadOutput(12, local.parameters.pads.row7.pad75);
-  registerPadOutput(13, local.parameters.pads.row7.pad76);
-  registerPadOutput(14, local.parameters.pads.row7.pad77);
-  registerPadOutput(15, local.parameters.pads.row7.pad78);
-  registerPadOutput(0, local.parameters.pads.row8.pad81);
-  registerPadOutput(1, local.parameters.pads.row8.pad82);
-  registerPadOutput(2, local.parameters.pads.row8.pad83);
-  registerPadOutput(3, local.parameters.pads.row8.pad84);
-  registerPadOutput(4, local.parameters.pads.row8.pad85);
-  registerPadOutput(5, local.parameters.pads.row8.pad86);
-  registerPadOutput(6, local.parameters.pads.row8.pad87);
-  registerPadOutput(7, local.parameters.pads.row8.pad88);
+  visitPadControls(registerPadControlOperation);
+}
+function handlePadControl(operation, note, controls) {
+  if (operation == registerPadControlOperation) {
+    registerPadOutput(note, controls);
+    return;
+  }
+  if (operation == fullResyncPadControlOperation) {
+    appendPadToFullResync(note, controls);
+  }
 }
 function registerPadOutput(note, controls) {
   padLedEnabledControls[note] = controls.ledEnabled;
   padColorModeControls[note] = controls.colorMode;
   padColorControls[note] = controls.color;
+  padPaletteModeControls[note] = controls.paletteMode;
 }
 function handlePadOutputParameterChange(parameter) {
   if (!padOutputReady) return;
   for (var note = sessionPadNoteMinimum; note <= sessionPadNoteMaximum; note += 1) {
-    if (parameter.is(padLedEnabledControls[note]) || parameter.is(padColorModeControls[note])) {
+    if (parameter.is(padLedEnabledControls[note])) {
       sendPadLedUpdate(note);
       return;
     }
+    if (parameter.is(padColorModeControls[note])) {
+      if (padLedEnabledControls[note].get()) sendPadLedUpdate(note);
+      return;
+    }
     if (parameter.is(padColorControls[note])) {
-      if (padLedEnabledControls[note].get() && padColorModeControls[note].get() == "rgb") {
+      if (padLedEnabledControls[note].get()) sendPadLedUpdate(note);
+      return;
+    }
+    if (parameter.is(padPaletteModeControls[note])) {
+      if (padLedEnabledControls[note].get() && padColorModeControls[note].get() == "palette") {
         sendPadLedUpdate(note);
       }
       return;
@@ -538,83 +729,53 @@ function isPadOutputConnected() {
   return connectionControl.get() && selectedDevice(1) != "";
 }
 function sendPadLedUpdate(note) {
-  var rgb = effectivePadRgb(note);
+  var ledEnabled = padLedEnabledControls[note].get();
+  if (!ledEnabled) {
+    sendHardwarePalettePad(note, 0);
+    logPadLedDisabled(note);
+    return;
+  }
+  var requestedRgb = effectiveColorRgb(padColorControls[note].get());
+  if (padColorModeControls[note].get() == "palette") {
+    var paletteIndex = nearestHardwarePaletteIndex(requestedRgb);
+    var selectedRgb = hardwarePaletteRgb(paletteIndex);
+    sendHardwarePalettePad(note, paletteIndex);
+    logPalettePadLedOutput(note, paletteIndex, selectedRgb, requestedRgb);
+    return;
+  }
+  sendExactRgbPad(note, requestedRgb);
+  logPadLedOutput(note, requestedRgb);
+}
+function sendFullPadResync() {
+  fullResyncExactMessage = exactRgbMessageHeader(0);
+  visitPadControls(fullResyncPadControlOperation);
+  var dataLength = fullResyncExactMessage.length - 6;
+  if (dataLength > 0) {
+    fullResyncExactMessage[4] = dataLength >> 7 & 127;
+    fullResyncExactMessage[5] = dataLength & 127;
+    local.sendSysex(fullResyncExactMessage);
+  }
+  logFullPadResyncOutput();
+}
+function appendPadToFullResync(note, controls) {
+  if (!controls.ledEnabled.get()) {
+    sendHardwarePalettePad(note, 0);
+    return;
+  }
+  var requestedRgb = effectiveColorRgb(controls.color.get());
+  if (controls.colorMode.get() == "palette") {
+    sendHardwarePalettePad(note, nearestHardwarePaletteIndex(requestedRgb));
+    return;
+  }
+  appendExactRgbPadRecord(fullResyncExactMessage, note, requestedRgb);
+}
+function sendHardwarePalettePad(note, paletteIndex) {
+  local.sendNoteOn(hardwarePaletteSolidChannel, note, paletteIndex);
+}
+function sendExactRgbPad(note, rgb) {
   var message = exactRgbMessageHeader(8);
   appendExactRgbPadRecord(message, note, rgb);
   local.sendSysex(message);
-  logPadLedOutput(note, rgb);
-}
-function sendFullPadResync() {
-  var message = exactRgbMessageHeader(8 * 64);
-  appendPadLedFromControls(message, 56, local.parameters.pads.row1.pad11);
-  appendPadLedFromControls(message, 57, local.parameters.pads.row1.pad12);
-  appendPadLedFromControls(message, 58, local.parameters.pads.row1.pad13);
-  appendPadLedFromControls(message, 59, local.parameters.pads.row1.pad14);
-  appendPadLedFromControls(message, 60, local.parameters.pads.row1.pad15);
-  appendPadLedFromControls(message, 61, local.parameters.pads.row1.pad16);
-  appendPadLedFromControls(message, 62, local.parameters.pads.row1.pad17);
-  appendPadLedFromControls(message, 63, local.parameters.pads.row1.pad18);
-  appendPadLedFromControls(message, 48, local.parameters.pads.row2.pad21);
-  appendPadLedFromControls(message, 49, local.parameters.pads.row2.pad22);
-  appendPadLedFromControls(message, 50, local.parameters.pads.row2.pad23);
-  appendPadLedFromControls(message, 51, local.parameters.pads.row2.pad24);
-  appendPadLedFromControls(message, 52, local.parameters.pads.row2.pad25);
-  appendPadLedFromControls(message, 53, local.parameters.pads.row2.pad26);
-  appendPadLedFromControls(message, 54, local.parameters.pads.row2.pad27);
-  appendPadLedFromControls(message, 55, local.parameters.pads.row2.pad28);
-  appendPadLedFromControls(message, 40, local.parameters.pads.row3.pad31);
-  appendPadLedFromControls(message, 41, local.parameters.pads.row3.pad32);
-  appendPadLedFromControls(message, 42, local.parameters.pads.row3.pad33);
-  appendPadLedFromControls(message, 43, local.parameters.pads.row3.pad34);
-  appendPadLedFromControls(message, 44, local.parameters.pads.row3.pad35);
-  appendPadLedFromControls(message, 45, local.parameters.pads.row3.pad36);
-  appendPadLedFromControls(message, 46, local.parameters.pads.row3.pad37);
-  appendPadLedFromControls(message, 47, local.parameters.pads.row3.pad38);
-  appendPadLedFromControls(message, 32, local.parameters.pads.row4.pad41);
-  appendPadLedFromControls(message, 33, local.parameters.pads.row4.pad42);
-  appendPadLedFromControls(message, 34, local.parameters.pads.row4.pad43);
-  appendPadLedFromControls(message, 35, local.parameters.pads.row4.pad44);
-  appendPadLedFromControls(message, 36, local.parameters.pads.row4.pad45);
-  appendPadLedFromControls(message, 37, local.parameters.pads.row4.pad46);
-  appendPadLedFromControls(message, 38, local.parameters.pads.row4.pad47);
-  appendPadLedFromControls(message, 39, local.parameters.pads.row4.pad48);
-  appendPadLedFromControls(message, 24, local.parameters.pads.row5.pad51);
-  appendPadLedFromControls(message, 25, local.parameters.pads.row5.pad52);
-  appendPadLedFromControls(message, 26, local.parameters.pads.row5.pad53);
-  appendPadLedFromControls(message, 27, local.parameters.pads.row5.pad54);
-  appendPadLedFromControls(message, 28, local.parameters.pads.row5.pad55);
-  appendPadLedFromControls(message, 29, local.parameters.pads.row5.pad56);
-  appendPadLedFromControls(message, 30, local.parameters.pads.row5.pad57);
-  appendPadLedFromControls(message, 31, local.parameters.pads.row5.pad58);
-  appendPadLedFromControls(message, 16, local.parameters.pads.row6.pad61);
-  appendPadLedFromControls(message, 17, local.parameters.pads.row6.pad62);
-  appendPadLedFromControls(message, 18, local.parameters.pads.row6.pad63);
-  appendPadLedFromControls(message, 19, local.parameters.pads.row6.pad64);
-  appendPadLedFromControls(message, 20, local.parameters.pads.row6.pad65);
-  appendPadLedFromControls(message, 21, local.parameters.pads.row6.pad66);
-  appendPadLedFromControls(message, 22, local.parameters.pads.row6.pad67);
-  appendPadLedFromControls(message, 23, local.parameters.pads.row6.pad68);
-  appendPadLedFromControls(message, 8, local.parameters.pads.row7.pad71);
-  appendPadLedFromControls(message, 9, local.parameters.pads.row7.pad72);
-  appendPadLedFromControls(message, 10, local.parameters.pads.row7.pad73);
-  appendPadLedFromControls(message, 11, local.parameters.pads.row7.pad74);
-  appendPadLedFromControls(message, 12, local.parameters.pads.row7.pad75);
-  appendPadLedFromControls(message, 13, local.parameters.pads.row7.pad76);
-  appendPadLedFromControls(message, 14, local.parameters.pads.row7.pad77);
-  appendPadLedFromControls(message, 15, local.parameters.pads.row7.pad78);
-  appendPadLedFromControls(message, 0, local.parameters.pads.row8.pad81);
-  appendPadLedFromControls(message, 1, local.parameters.pads.row8.pad82);
-  appendPadLedFromControls(message, 2, local.parameters.pads.row8.pad83);
-  appendPadLedFromControls(message, 3, local.parameters.pads.row8.pad84);
-  appendPadLedFromControls(message, 4, local.parameters.pads.row8.pad85);
-  appendPadLedFromControls(message, 5, local.parameters.pads.row8.pad86);
-  appendPadLedFromControls(message, 6, local.parameters.pads.row8.pad87);
-  appendPadLedFromControls(message, 7, local.parameters.pads.row8.pad88);
-  local.sendSysex(message);
-  logFullPadResyncOutput();
-}
-function appendPadLedFromControls(message, note, controls) {
-  appendExactRgbPadRecord(message, note, effectivePadRgbFromControls(controls));
 }
 function exactRgbMessageHeader(dataLength) {
   return [
@@ -635,24 +796,7 @@ function appendExactRgbPadRecord(message, note, rgb) {
 function appendSevenBitPair(message, value) {
   message.push(value >> 7 & 127, value & 127);
 }
-function effectivePadRgb(note) {
-  return effectiveRgbValues(
-    padLedEnabledControls[note].get(),
-    padColorModeControls[note].get(),
-    padColorControls[note].get()
-  );
-}
-function effectivePadRgbFromControls(controls) {
-  return effectiveRgbValues(
-    controls.ledEnabled.get(),
-    controls.colorMode.get(),
-    controls.color.get()
-  );
-}
-function effectiveRgbValues(ledEnabled, colorMode, color) {
-  if (!ledEnabled || colorMode != "rgb") {
-    return [0, 0, 0];
-  }
+function effectiveColorRgb(color) {
   var alpha = clampNormalized(color[3]);
   return [
     normalizedColorByte(color[0], alpha),

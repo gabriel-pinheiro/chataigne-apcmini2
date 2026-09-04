@@ -20,6 +20,9 @@ export type RuntimeFunctions = {
   fullResync(): void;
   decodePadMode(data: number[]): string;
   decodeIntroductionFaders(data: number[]): number[];
+  nearestHardwarePaletteIndex(rgb: number[]): number;
+  hardwarePaletteRgb(index: number): number[];
+  effectiveColorRgb(color: [number, number, number, number]): number[];
   padLabel(note: number): string;
   formatMidiValue(value: number): string;
 };
@@ -71,6 +74,7 @@ export async function createRuntime(options: RuntimeOptions = {}) {
   );
   const warnings: string[] = [];
   const logs: string[] = [];
+  const noteMessages: number[][] = [];
   const sysexMessages: number[][] = [];
   let currentTime = 0;
   let updateRate = 0;
@@ -151,6 +155,9 @@ export async function createRuntime(options: RuntimeOptions = {}) {
     local: {
       parameters,
       values,
+      sendNoteOn: (...message: number[]) => {
+        noteMessages.push(message);
+      },
       sendSysex: (...parts: Array<number | number[]>) => {
         const message = parts.flatMap((part) => typeof part === "number" ? [part] : part);
         sysexMessages.push(message);
@@ -185,6 +192,7 @@ export async function createRuntime(options: RuntimeOptions = {}) {
     sceneButtons,
     shift: shift.isPressed,
     faders,
+    noteMessages,
     sysexMessages,
     logs,
     warnings,

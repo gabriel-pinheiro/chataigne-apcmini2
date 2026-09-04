@@ -95,7 +95,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -137,7 +137,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 1.2": {
@@ -157,7 +157,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -199,7 +199,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 1.3": {
@@ -219,7 +219,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -261,7 +261,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 1.4": {
@@ -281,7 +281,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -323,7 +323,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 1.5": {
@@ -343,7 +343,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -385,7 +385,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 1.6": {
@@ -405,7 +405,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -447,7 +447,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 1.7": {
@@ -467,7 +467,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -509,7 +509,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 1.8": {
@@ -529,7 +529,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -571,7 +571,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         }
       },
@@ -595,7 +595,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -637,7 +637,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 2.2": {
@@ -657,7 +657,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -699,7 +699,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 2.3": {
@@ -719,7 +719,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -761,7 +761,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 2.4": {
@@ -781,7 +781,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -823,7 +823,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 2.5": {
@@ -843,7 +843,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -885,7 +885,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 2.6": {
@@ -905,7 +905,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -947,7 +947,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 2.7": {
@@ -967,7 +967,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -1009,7 +1009,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 2.8": {
@@ -1029,7 +1029,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -1071,7 +1071,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         }
       },
@@ -1095,7 +1095,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -1137,7 +1137,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 3.2": {
@@ -1157,7 +1157,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -1199,7 +1199,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 3.3": {
@@ -1219,7 +1219,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -1261,7 +1261,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 3.4": {
@@ -1281,7 +1281,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -1323,7 +1323,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 3.5": {
@@ -1343,7 +1343,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -1385,7 +1385,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 3.6": {
@@ -1405,7 +1405,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -1447,7 +1447,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 3.7": {
@@ -1467,7 +1467,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -1509,7 +1509,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 3.8": {
@@ -1529,7 +1529,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -1571,7 +1571,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         }
       },
@@ -1595,7 +1595,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -1637,7 +1637,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 4.2": {
@@ -1657,7 +1657,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -1699,7 +1699,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 4.3": {
@@ -1719,7 +1719,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -1761,7 +1761,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 4.4": {
@@ -1781,7 +1781,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -1823,7 +1823,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 4.5": {
@@ -1843,7 +1843,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -1885,7 +1885,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 4.6": {
@@ -1905,7 +1905,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -1947,7 +1947,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 4.7": {
@@ -1967,7 +1967,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -2009,7 +2009,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 4.8": {
@@ -2029,7 +2029,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -2071,7 +2071,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         }
       },
@@ -2095,7 +2095,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -2137,7 +2137,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 5.2": {
@@ -2157,7 +2157,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -2199,7 +2199,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 5.3": {
@@ -2219,7 +2219,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -2261,7 +2261,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 5.4": {
@@ -2281,7 +2281,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -2323,7 +2323,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 5.5": {
@@ -2343,7 +2343,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -2385,7 +2385,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 5.6": {
@@ -2405,7 +2405,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -2447,7 +2447,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 5.7": {
@@ -2467,7 +2467,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -2509,7 +2509,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 5.8": {
@@ -2529,7 +2529,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -2571,7 +2571,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         }
       },
@@ -2595,7 +2595,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -2637,7 +2637,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 6.2": {
@@ -2657,7 +2657,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -2699,7 +2699,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 6.3": {
@@ -2719,7 +2719,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -2761,7 +2761,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 6.4": {
@@ -2781,7 +2781,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -2823,7 +2823,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 6.5": {
@@ -2843,7 +2843,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -2885,7 +2885,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 6.6": {
@@ -2905,7 +2905,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -2947,7 +2947,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 6.7": {
@@ -2967,7 +2967,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -3009,7 +3009,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 6.8": {
@@ -3029,7 +3029,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -3071,7 +3071,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         }
       },
@@ -3095,7 +3095,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -3137,7 +3137,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 7.2": {
@@ -3157,7 +3157,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -3199,7 +3199,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 7.3": {
@@ -3219,7 +3219,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -3261,7 +3261,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 7.4": {
@@ -3281,7 +3281,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -3323,7 +3323,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 7.5": {
@@ -3343,7 +3343,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -3385,7 +3385,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 7.6": {
@@ -3405,7 +3405,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -3447,7 +3447,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 7.7": {
@@ -3467,7 +3467,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -3509,7 +3509,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 7.8": {
@@ -3529,7 +3529,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -3571,7 +3571,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         }
       },
@@ -3595,7 +3595,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -3637,7 +3637,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 8.2": {
@@ -3657,7 +3657,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -3699,7 +3699,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 8.3": {
@@ -3719,7 +3719,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -3761,7 +3761,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 8.4": {
@@ -3781,7 +3781,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -3823,7 +3823,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 8.5": {
@@ -3843,7 +3843,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -3885,7 +3885,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 8.6": {
@@ -3905,7 +3905,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -3947,7 +3947,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 8.7": {
@@ -3967,7 +3967,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -4009,7 +4009,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         },
         "Pad 8.8": {
@@ -4029,7 +4029,7 @@
               "Exact RGB": "rgb",
               "Hardware Palette": "palette"
             },
-            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color and supports hardware LED modes."
+            "description": "Exact RGB uses SysEx. Hardware Palette selects the nearest native color."
           },
           "Color": {
             "type": "Color",
@@ -4071,7 +4071,7 @@
               "check": "equals",
               "action": "enable"
             },
-            "description": "Native brightness or clock-synchronized pulse/blink behavior. Available in Hardware Palette mode."
+            "description": "Selects native brightness or clock-synchronized animation. In this version, every option renders as Solid 100%."
           }
         }
       }
