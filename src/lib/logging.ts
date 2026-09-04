@@ -112,12 +112,14 @@ function logPalettePadLedOutput(
   note: number,
   paletteIndex: number,
   selectedRgb: number[],
-  requestedRgb: number[]
+  requestedRgb: number[],
+  paletteModeLabel: string
 ): void {
   if (!interpretedOutputLogControl.get()) return;
   script.log(
     "Pad LED Updated: " + padLabel(note)
     + " = Palette " + paletteIndex + " " + formatRgbHex(selectedRgb)
+    + ", " + paletteModeLabel
     + " (requested " + formatRgbHex(requestedRgb) + ")"
   );
 }

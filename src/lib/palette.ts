@@ -49,3 +49,41 @@ function hardwarePaletteRgb(index: number): number[] {
     color % 256
   ];
 }
+
+function hardwarePaletteModeChannel(mode: string): number {
+  if (mode == "solid10") return 1;
+  if (mode == "solid25") return 2;
+  if (mode == "solid50") return 3;
+  if (mode == "solid65") return 4;
+  if (mode == "solid75") return 5;
+  if (mode == "solid90") return 6;
+  if (mode == "pulse16") return 8;
+  if (mode == "pulse8") return 9;
+  if (mode == "pulse4") return 10;
+  if (mode == "pulse2") return 11;
+  if (mode == "blink24") return 12;
+  if (mode == "blink16") return 13;
+  if (mode == "blink8") return 14;
+  if (mode == "blink4") return 15;
+  if (mode == "blink2") return 16;
+  return 7;
+}
+
+function hardwarePaletteModeLabel(mode: string): string {
+  if (mode == "solid10") return "Solid - 10%";
+  if (mode == "solid25") return "Solid - 25%";
+  if (mode == "solid50") return "Solid - 50%";
+  if (mode == "solid65") return "Solid - 65%";
+  if (mode == "solid75") return "Solid - 75%";
+  if (mode == "solid90") return "Solid - 90%";
+  if (mode == "pulse16") return "Pulse - 1/16";
+  if (mode == "pulse8") return "Pulse - 1/8";
+  if (mode == "pulse4") return "Pulse - 1/4";
+  if (mode == "pulse2") return "Pulse - 1/2";
+  if (mode == "blink24") return "Blink - 1/24";
+  if (mode == "blink16") return "Blink - 1/16";
+  if (mode == "blink8") return "Blink - 1/8";
+  if (mode == "blink4") return "Blink - 1/4";
+  if (mode == "blink2") return "Blink - 1/2";
+  return "Solid - 100%";
+}

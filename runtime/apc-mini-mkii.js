@@ -352,10 +352,10 @@ function logPadLedOutput(note, rgb) {
   if (!interpretedOutputLogControl.get()) return;
   script.log("Pad LED Updated: " + padLabel(note) + " = " + formatRgbHex(rgb));
 }
-function logPalettePadLedOutput(note, paletteIndex, selectedRgb, requestedRgb) {
+function logPalettePadLedOutput(note, paletteIndex, selectedRgb, requestedRgb, paletteModeLabel) {
   if (!interpretedOutputLogControl.get()) return;
   script.log(
-    "Pad LED Updated: " + padLabel(note) + " = Palette " + paletteIndex + " " + formatRgbHex(selectedRgb) + " (requested " + formatRgbHex(requestedRgb) + ")"
+    "Pad LED Updated: " + padLabel(note) + " = Palette " + paletteIndex + " " + formatRgbHex(selectedRgb) + ", " + paletteModeLabel + " (requested " + formatRgbHex(requestedRgb) + ")"
   );
 }
 function logPadLedDisabled(note) {
@@ -589,6 +589,42 @@ function hardwarePaletteRgb(index) {
     color % 256
   ];
 }
+function hardwarePaletteModeChannel(mode) {
+  if (mode == "solid10") return 1;
+  if (mode == "solid25") return 2;
+  if (mode == "solid50") return 3;
+  if (mode == "solid65") return 4;
+  if (mode == "solid75") return 5;
+  if (mode == "solid90") return 6;
+  if (mode == "pulse16") return 8;
+  if (mode == "pulse8") return 9;
+  if (mode == "pulse4") return 10;
+  if (mode == "pulse2") return 11;
+  if (mode == "blink24") return 12;
+  if (mode == "blink16") return 13;
+  if (mode == "blink8") return 14;
+  if (mode == "blink4") return 15;
+  if (mode == "blink2") return 16;
+  return 7;
+}
+function hardwarePaletteModeLabel(mode) {
+  if (mode == "solid10") return "Solid - 10%";
+  if (mode == "solid25") return "Solid - 25%";
+  if (mode == "solid50") return "Solid - 50%";
+  if (mode == "solid65") return "Solid - 65%";
+  if (mode == "solid75") return "Solid - 75%";
+  if (mode == "solid90") return "Solid - 90%";
+  if (mode == "pulse16") return "Pulse - 1/16";
+  if (mode == "pulse8") return "Pulse - 1/8";
+  if (mode == "pulse4") return "Pulse - 1/4";
+  if (mode == "pulse2") return "Pulse - 1/2";
+  if (mode == "blink24") return "Blink - 1/24";
+  if (mode == "blink16") return "Blink - 1/16";
+  if (mode == "blink8") return "Blink - 1/8";
+  if (mode == "blink4") return "Blink - 1/4";
+  if (mode == "blink2") return "Blink - 1/2";
+  return "Solid - 100%";
+}
 function visitPadControls(operation) {
   handlePadControl(operation, 56, local.parameters.pads.row1.pad11);
   handlePadControl(operation, 57, local.parameters.pads.row1.pad12);
@@ -662,7 +698,6 @@ var padPaletteModeControls = [];
 var padOutputReady = false;
 var registerPadControlOperation = 0;
 var fullResyncPadControlOperation = 1;
-var hardwarePaletteSolidChannel = 7;
 var fullResyncExactMessage = [];
 function initializePadOutput() {
   visitPadControls(registerPadControlOperation);
@@ -731,7 +766,7 @@ function isPadOutputConnected() {
 function sendPadLedUpdate(note) {
   var ledEnabled = padLedEnabledControls[note].get();
   if (!ledEnabled) {
-    sendHardwarePalettePad(note, 0);
+    sendHardwarePalettePad(note, 0, "solid100");
     logPadLedDisabled(note);
     return;
   }
@@ -739,8 +774,15 @@ function sendPadLedUpdate(note) {
   if (padColorModeControls[note].get() == "palette") {
     var paletteIndex = nearestHardwarePaletteIndex(requestedRgb);
     var selectedRgb = hardwarePaletteRgb(paletteIndex);
-    sendHardwarePalettePad(note, paletteIndex);
-    logPalettePadLedOutput(note, paletteIndex, selectedRgb, requestedRgb);
+    var paletteMode = padPaletteModeControls[note].get();
+    sendHardwarePalettePad(note, paletteIndex, paletteMode);
+    logPalettePadLedOutput(
+      note,
+      paletteIndex,
+      selectedRgb,
+      requestedRgb,
+      hardwarePaletteModeLabel(paletteMode)
+    );
     return;
   }
   sendExactRgbPad(note, requestedRgb);
@@ -759,18 +801,22 @@ function sendFullPadResync() {
 }
 function appendPadToFullResync(note, controls) {
   if (!controls.ledEnabled.get()) {
-    sendHardwarePalettePad(note, 0);
+    sendHardwarePalettePad(note, 0, "solid100");
     return;
   }
   var requestedRgb = effectiveColorRgb(controls.color.get());
   if (controls.colorMode.get() == "palette") {
-    sendHardwarePalettePad(note, nearestHardwarePaletteIndex(requestedRgb));
+    sendHardwarePalettePad(
+      note,
+      nearestHardwarePaletteIndex(requestedRgb),
+      controls.paletteMode.get()
+    );
     return;
   }
   appendExactRgbPadRecord(fullResyncExactMessage, note, requestedRgb);
 }
-function sendHardwarePalettePad(note, paletteIndex) {
-  local.sendNoteOn(hardwarePaletteSolidChannel, note, paletteIndex);
+function sendHardwarePalettePad(note, paletteIndex, paletteMode) {
+  local.sendNoteOn(hardwarePaletteModeChannel(paletteMode), note, paletteIndex);
 }
 function sendExactRgbPad(note, rgb) {
   var message = exactRgbMessageHeader(8);

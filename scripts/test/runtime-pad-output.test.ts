@@ -8,6 +8,25 @@ const introductionResponse = [
   0, 16, 32, 48, 64, 80, 96, 112, 126
 ];
 
+const nativePaletteModes = [
+  ["solid10", 1, "Solid - 10%"],
+  ["solid25", 2, "Solid - 25%"],
+  ["solid50", 3, "Solid - 50%"],
+  ["solid65", 4, "Solid - 65%"],
+  ["solid75", 5, "Solid - 75%"],
+  ["solid90", 6, "Solid - 90%"],
+  ["solid100", 7, "Solid - 100%"],
+  ["pulse16", 8, "Pulse - 1/16"],
+  ["pulse8", 9, "Pulse - 1/8"],
+  ["pulse4", 10, "Pulse - 1/4"],
+  ["pulse2", 11, "Pulse - 1/2"],
+  ["blink24", 12, "Blink - 1/24"],
+  ["blink16", 13, "Blink - 1/16"],
+  ["blink8", 14, "Blink - 1/8"],
+  ["blink4", 15, "Blink - 1/4"],
+  ["blink2", 16, "Blink - 1/2"]
+] as const;
+
 async function createReadyRuntime(logInterpretedOutput = false) {
   const result = await createRuntime({ logInterpretedOutput });
   result.runtime.init();
@@ -63,7 +82,7 @@ test("sends an immediate Exact RGB update with RGB multiplied by alpha", async (
   assert.deepEqual(logs, ["Pad LED Updated: 4.6 = #804020"]);
 });
 
-test("renders Hardware Palette immediately and treats every Palette Mode as Solid 100%", async () => {
+test("renders every native Hardware Palette brightness, pulse, and blink mode", async () => {
   const { runtime, padParameters, noteMessages, sysexMessages, logs } =
     await createReadyRuntime(true);
   noteMessages.length = 0;
@@ -81,20 +100,29 @@ test("renders Hardware Palette immediately and treats every Palette Mode as Soli
   runtime.moduleParameterChanged(pad.colorMode);
   assert.deepEqual(noteMessages, [[7, 56, 5]]);
   assert.deepEqual(logs, [
-    "Pad LED Updated: 1.1 = Palette 5 #FF0000 (requested #FF0000)"
+    "Pad LED Updated: 1.1 = Palette 5 #FF0000, Solid - 100% (requested #FF0000)"
   ]);
+
+  noteMessages.length = 0;
+  logs.length = 0;
+  for (const [mode, channel] of nativePaletteModes) {
+    pad.paletteMode.set(mode);
+    runtime.moduleParameterChanged(pad.paletteMode);
+    assert.deepEqual(noteMessages.at(-1), [channel, 56, 5]);
+  }
+  assert.deepEqual(
+    logs,
+    nativePaletteModes.map(([, , label]) =>
+      `Pad LED Updated: 1.1 = Palette 5 #FF0000, ${label} (requested #FF0000)`
+    )
+  );
 
   const green = [0, 1, 0, 0.5] as [number, number, number, number];
   const effectiveGreen = Array.from(runtime.effectiveColorRgb(green));
   const greenIndex = runtime.nearestHardwarePaletteIndex(effectiveGreen);
   pad.color.set(green);
   runtime.moduleParameterChanged(pad.color);
-  pad.paletteMode.set("blink4");
-  runtime.moduleParameterChanged(pad.paletteMode);
-  assert.deepEqual(noteMessages.slice(-2), [
-    [7, 56, greenIndex],
-    [7, 56, greenIndex]
-  ]);
+  assert.deepEqual(noteMessages.at(-1), [16, 56, greenIndex]);
 
   pad.colorMode.set("rgb");
   runtime.moduleParameterChanged(pad.colorMode);
@@ -135,6 +163,7 @@ test("full resync mixes palette Note On messages with combined Exact RGB records
   palettePad.ledEnabled.set(true);
   palettePad.colorMode.set("palette");
   palettePad.color.set([1, 0, 0, 1]);
+  palettePad.paletteMode.set("pulse4");
 
   result.advanceTime(0.11);
   result.runtime.update(0.11);
@@ -142,7 +171,7 @@ test("full resync mixes palette Note On messages with combined Exact RGB records
 
   assert.equal(result.noteMessages.length, 63);
   assert.ok(result.noteMessages.some((message) =>
-    message[0] === 7 && message[1] === 49 && message[2] === 5
+    message[0] === 10 && message[1] === 49 && message[2] === 5
   ));
   assert.ok(!result.noteMessages.some((message) => message[1] === 56));
 

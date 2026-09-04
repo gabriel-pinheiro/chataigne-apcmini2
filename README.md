@@ -32,6 +32,11 @@ immediately after the controller has initialized. A color's alpha is multiplied
 into its red, green, and blue components before output; Hardware Palette then
 selects the nearest of the controller's 128 native colors.
 
+Hardware Palette supports all native LED behaviors: seven solid brightness
+levels, four pulse rates, and five blink rates. Pulse and blink subdivisions
+follow MIDI Beat Clock; the module's `Clock > Send Clock` control is enabled by
+default so animated modes work without additional configuration.
+
 The module sends the complete current pad state after initialization, including
 after the initialization timeout. Disabled pads are explicitly sent as black,
 so reconnecting cannot leave stale LEDs on the controller. The `Full Resync`

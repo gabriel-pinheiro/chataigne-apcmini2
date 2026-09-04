@@ -6,7 +6,6 @@ var padOutputReady = false;
 
 var registerPadControlOperation = 0;
 var fullResyncPadControlOperation = 1;
-var hardwarePaletteSolidChannel = 7;
 var fullResyncExactMessage: number[] = [];
 
 function initializePadOutput(): void {
@@ -94,7 +93,7 @@ function isPadOutputConnected(): boolean {
 function sendPadLedUpdate(note: number): void {
   var ledEnabled = padLedEnabledControls[note].get();
   if (!ledEnabled) {
-    sendHardwarePalettePad(note, 0);
+    sendHardwarePalettePad(note, 0, "solid100");
     logPadLedDisabled(note);
     return;
   }
@@ -103,8 +102,15 @@ function sendPadLedUpdate(note: number): void {
   if (padColorModeControls[note].get() == "palette") {
     var paletteIndex = nearestHardwarePaletteIndex(requestedRgb);
     var selectedRgb = hardwarePaletteRgb(paletteIndex);
-    sendHardwarePalettePad(note, paletteIndex);
-    logPalettePadLedOutput(note, paletteIndex, selectedRgb, requestedRgb);
+    var paletteMode = padPaletteModeControls[note].get();
+    sendHardwarePalettePad(note, paletteIndex, paletteMode);
+    logPalettePadLedOutput(
+      note,
+      paletteIndex,
+      selectedRgb,
+      requestedRgb,
+      hardwarePaletteModeLabel(paletteMode)
+    );
     return;
   }
 
@@ -127,22 +133,29 @@ function sendFullPadResync(): void {
 
 function appendPadToFullResync(note: number, controls: ChataignePadParameters): void {
   if (!controls.ledEnabled.get()) {
-    sendHardwarePalettePad(note, 0);
+    sendHardwarePalettePad(note, 0, "solid100");
     return;
   }
 
   var requestedRgb = effectiveColorRgb(controls.color.get());
   if (controls.colorMode.get() == "palette") {
-    sendHardwarePalettePad(note, nearestHardwarePaletteIndex(requestedRgb));
+    sendHardwarePalettePad(
+      note,
+      nearestHardwarePaletteIndex(requestedRgb),
+      controls.paletteMode.get()
+    );
     return;
   }
 
   appendExactRgbPadRecord(fullResyncExactMessage, note, requestedRgb);
 }
 
-function sendHardwarePalettePad(note: number, paletteIndex: number): void {
-  // All Palette Mode selections intentionally use Solid 100% in this stage.
-  local.sendNoteOn(hardwarePaletteSolidChannel, note, paletteIndex);
+function sendHardwarePalettePad(
+  note: number,
+  paletteIndex: number,
+  paletteMode: string
+): void {
+  local.sendNoteOn(hardwarePaletteModeChannel(paletteMode), note, paletteIndex);
 }
 
 function sendExactRgbPad(note: number, rgb: number[]): void {
