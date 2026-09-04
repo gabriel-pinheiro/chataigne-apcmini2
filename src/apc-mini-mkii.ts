@@ -89,7 +89,7 @@ function sysExEvent(data: number[]): void {
 
   var mode = decodePadMode(data);
   if (mode != "") {
-    setPadMode(mode);
+    handlePadModeNotification(mode);
     logPadModeInput(mode);
     return;
   }

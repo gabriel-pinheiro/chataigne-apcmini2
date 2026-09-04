@@ -1043,7 +1043,7 @@ function isDrumPadMessage(channel, pitch) {
   return channel == drumMidiChannel && pitch >= drumPadNoteMinimum && pitch <= drumPadNoteMaximum;
 }
 function setPadMode(mode) {
-  if (currentPadMode == mode) return;
+  if (currentPadMode == mode) return false;
   currentPadMode = mode;
   padModeControl.setData(mode);
   if (mode == "drum") {
@@ -1058,6 +1058,13 @@ function setPadMode(mode) {
     script.logWarning(
       "Note Edit Mode is not supported. Press Shift + Scene 7 to return to Session Mode."
     );
+  }
+  return true;
+}
+function handlePadModeNotification(mode) {
+  var modeChanged = setPadMode(mode);
+  if (modeChanged && mode == "session" && controllerOutputReady && isControllerOutputConnected()) {
+    sendFullControllerResync();
   }
 }
 var deviceControls;
@@ -1360,7 +1367,7 @@ function sysExEvent(data) {
   }
   var mode = decodePadMode(data);
   if (mode != "") {
-    setPadMode(mode);
+    handlePadModeNotification(mode);
     logPadModeInput(mode);
     return;
   }

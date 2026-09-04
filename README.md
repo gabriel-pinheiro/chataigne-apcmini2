@@ -81,7 +81,10 @@ The APC Mini mkII has four hardware pad modes:
   It is used to edit Note Mode settings and is not currently supported.
 
 If you enter Drum, Note, or Note Edit Mode accidentally, use the controller's
-mode shortcut to return to Session Mode.
+mode shortcut to return to Session Mode. When the module detects a transition
+back to Session Mode, it automatically performs a full resync of all pad and
+button LEDs so the saved Chataigne state replaces the hardware mode's LED
+layout.
 
 The detected mode is available at `Values > Status > Pad Mode`. Until the
 controller reports its mode or sends an identifiable pad event, it is shown as

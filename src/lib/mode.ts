@@ -13,8 +13,8 @@ function isDrumPadMessage(channel: number, pitch: number): boolean {
     && pitch <= drumPadNoteMaximum;
 }
 
-function setPadMode(mode: PadMode): void {
-  if (currentPadMode == mode) return;
+function setPadMode(mode: PadMode): boolean {
+  if (currentPadMode == mode) return false;
   currentPadMode = mode;
   padModeControl.setData(mode);
 
@@ -30,5 +30,17 @@ function setPadMode(mode: PadMode): void {
     script.logWarning(
       "Note Edit Mode is not supported. Press Shift + Scene 7 to return to Session Mode."
     );
+  }
+
+  return true;
+}
+
+function handlePadModeNotification(mode: PadMode): void {
+  var modeChanged = setPadMode(mode);
+  if (modeChanged
+    && mode == "session"
+    && controllerOutputReady
+    && isControllerOutputConnected()) {
+    sendFullControllerResync();
   }
 }
