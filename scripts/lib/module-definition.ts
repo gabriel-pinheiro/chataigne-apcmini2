@@ -15,7 +15,6 @@ export const moduleDefinition: Definition = {
   hideDefaultCommands: true,
   scripts: ["runtime/apc-mini-mkii.js"],
   defaults: {
-    devices: ["APC mini mk2 Control", "APC mini mk2 Control"],
     autoAdd: false
   },
   hideDefaultParameters: [

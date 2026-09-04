@@ -35,13 +35,18 @@ test("uses Drum MIDI as a fallback without treating it as Session input", async 
 });
 
 test("warns about the Notes port and does not map its pitches as pads", async () => {
-  const { runtime, pads, warnings } = await createRuntime({
-    devices: ["APC mini mk2 Notes", "APC mini mk2 Control"]
+  const { runtime, devices, pads, warnings, sysexMessages, advanceTime } = await createRuntime({
+    devices: ["aPc mini MK2 NoTeS", "control-out"]
   });
   runtime.init();
+  advanceTime(1);
+  runtime.update(1);
   runtime.noteOnEvent(1, 56, 127);
 
   assert.equal(pads.row1.pad11.isPressed.get(), false);
+  assert.deepEqual(sysexMessages, []);
   assert.equal(warnings.length, 1);
   assert.match(warnings[0], /Notes port is not supported/);
+  runtime.moduleParameterChanged(devices);
+  assert.equal(warnings.length, 1);
 });

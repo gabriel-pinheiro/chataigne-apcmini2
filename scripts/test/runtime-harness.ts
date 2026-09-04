@@ -6,6 +6,7 @@ export type MockParameter<T> = {
   setHistory: T[];
   get(): T;
   getControlAddress(): string;
+  getJSONData(): Record<string, unknown>;
   is(other: MockParameter<unknown>): boolean;
   set(value: T): void;
   setAttribute(name: string, value: boolean | number | string): void;
@@ -44,6 +45,7 @@ export function parameter<T>(initialValue: T): MockParameter<T> {
     setHistory,
     get: () => value,
     getControlAddress: () => controlAddress,
+    getJSONData: () => ({ value }),
     is: (other) => other.getControlAddress() === controlAddress,
     set: (nextValue) => {
       value = nextValue;
@@ -94,7 +96,7 @@ export async function createRuntime(options: RuntimeOptions = {}) {
   const enableLog = parameter(false);
 
   const devices = parameter(
-    options.devices ?? ["APC mini mk2 Control", "APC mini mk2 Control"]
+    options.devices ?? ["20-0", "20-0"]
   );
   const isConnected = parameter(options.connected ?? true);
   const logInterpretedInput = parameter(options.logInterpretedInput ?? false);

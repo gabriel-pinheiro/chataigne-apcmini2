@@ -68,7 +68,11 @@ test("starts the MIDI clock after the bounded initialization timeout", async () 
   runtime.update(0.11);
   assert.equal(midiSendClock.get(), false);
 
-  advanceTime(1.01);
-  runtime.update(1.01);
+  advanceTime(0.51);
+  runtime.update(0.51);
+  assert.equal(midiSendClock.get(), false);
+
+  advanceTime(0.51);
+  runtime.update(0.51);
   assert.equal(midiSendClock.get(), true);
 });

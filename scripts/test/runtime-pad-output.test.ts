@@ -215,10 +215,12 @@ test("resyncs after initialization timeout while keeping the timeout warning", a
   runtime.init();
   advanceTime(0.11);
   runtime.update(0.11);
-  advanceTime(1.01);
-  runtime.update(1.01);
+  advanceTime(0.51);
+  runtime.update(0.51);
+  advanceTime(0.51);
+  runtime.update(0.51);
 
-  assert.equal(sysexMessages.length, 1);
+  assert.equal(sysexMessages.length, 2);
   assert.equal(noteMessages.filter((message) => message[1] <= 63).length, 64);
   assert.equal(warnings.length, 1);
   assert.match(warnings[0], /did not respond to initialization/);

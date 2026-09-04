@@ -17,6 +17,8 @@ nine current fader positions from the controller. Some controller states return
 retries once and preserves its last known values if that ambiguous response is
 repeated.
 
+Select `APC mini mk2 Control` for both MIDI input and output, even if you're going to use just one of them. Both are important for the handshake.
+
 ### Interpreted logging
 
 `Parameters > Logging` contains opt-in `Log Interpreted Input` and
@@ -67,8 +69,7 @@ The APC Mini mkII has three hardware pad modes:
 - **Note Mode** is toggled with Shift + Scene 7. It sends musical notes through
   the separate `APC mini mk2 Notes` MIDI port and is not currently supported.
 
-Select `APC mini mk2 Control` for both the module's MIDI input and output. If
-you enter Drum or Note Mode accidentally, press the same Shift combination
+If you enter Drum or Note Mode accidentally, press the same Shift combination
 again to return to Session Mode.
 
 The detected mode is available at `Values > Status > Pad Mode`. Until the

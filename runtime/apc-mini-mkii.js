@@ -1013,11 +1013,12 @@ var deviceControls;
 var connectionControl;
 var previousInputDevice = "";
 var wrongInputDeviceSelected = false;
-var wrongDeviceWarningShown = false;
+var currentDeviceConfigurationWarning = "";
+var invalidInitialMidiInputValue = "MIDI Devices to connect to";
 var introductionState = 0;
 var introductionStateChangedAt = 0;
-var introductionDelaySeconds = 0.1;
-var introductionTimeoutSeconds = 1;
+var deviceSettleDelaySeconds = 0.1;
+var introductionRetryDelaySeconds = 0.5;
 var introductionAttempts = 0;
 var maximumIntroductionAttempts = 2;
 function initializeConnection() {
@@ -1025,7 +1026,6 @@ function initializeConnection() {
   connectionControl = local.parameters.isConnected;
   previousInputDevice = selectedDevice(0);
   resetPressedValues();
-  validateSelectedDevices();
   scheduleIntroduction();
 }
 function handleIntroductionResponse(data) {
@@ -1065,10 +1065,6 @@ function handleModuleParameterChange(parameter) {
     if (!connectionControl.get()) {
       resetPressedValues();
       setPadMode("unknown");
-      introductionState = 0;
-      markControllerOutputInitializing();
-      markMidiClockInitializing();
-      return;
     }
     scheduleIntroduction();
   }
@@ -1076,18 +1072,18 @@ function handleModuleParameterChange(parameter) {
 function updateIntroduction() {
   if (introductionState == 0) return;
   var now = util.getTime();
-  if (introductionState == 1 && now - introductionStateChangedAt >= introductionDelaySeconds) {
-    introductionState = 2;
-    introductionStateChangedAt = now;
-    introductionAttempts += 1;
-    logInitializationRequest(introductionAttempts);
-    sendIntroductionRequest();
+  if (introductionState == 1 && now - introductionStateChangedAt >= deviceSettleDelaySeconds) {
+    beginIntroductionAfterDeviceSettle(now);
     return;
   }
-  if (introductionState == 2 && now - introductionStateChangedAt >= introductionTimeoutSeconds) {
+  if (introductionState == 2 && now - introductionStateChangedAt >= introductionRetryDelaySeconds) {
+    if (introductionAttempts < maximumIntroductionAttempts) {
+      sendIntroductionAttempt(now);
+      return;
+    }
     introductionState = 0;
     script.logWarning(
-      "APC Mini mkII did not respond to initialization. Incoming MIDI will continue, but initial fader positions may be unknown."
+      "APC Mini mkII did not respond to initialization. Verify that APC mini mk2 Control (not Notes) is selected for both MIDI devices."
     );
     completeDeviceInitialization();
   }
@@ -1099,19 +1095,30 @@ function handleDeviceChange() {
     setPadMode("unknown");
   }
   previousInputDevice = inputDevice;
-  validateSelectedDevices();
   scheduleIntroduction();
 }
 function scheduleIntroduction() {
   markControllerOutputInitializing();
   markMidiClockInitializing();
-  if (!connectionControl.get() || selectedDevice(0) == "" || selectedDevice(1) == "") {
-    introductionState = 0;
-    return;
-  }
   introductionAttempts = 0;
   introductionState = 1;
   introductionStateChangedAt = util.getTime();
+}
+function beginIntroductionAfterDeviceSettle(now) {
+  var inputDevice = selectedDevice(0);
+  var outputDevice = selectedDevice(1);
+  if (!validateSelectedDevices(inputDevice, outputDevice) || !connectionControl.get() || inputDevice == "" || outputDevice == "") {
+    introductionState = 0;
+    return;
+  }
+  sendIntroductionAttempt(now);
+}
+function sendIntroductionAttempt(now) {
+  introductionState = 2;
+  introductionStateChangedAt = now;
+  introductionAttempts += 1;
+  logInitializationRequest(introductionAttempts);
+  sendIntroductionRequest();
 }
 function completeDeviceInitialization() {
   completeControllerOutputInitialization();
@@ -1127,23 +1134,52 @@ function isAmbiguousFaderSnapshot(values) {
 function selectedDevice(index) {
   var devices = deviceControls.get();
   if (!devices || devices.length <= index || !devices[index]) return "";
-  return devices[index];
+  var device = "" + devices[index];
+  if (index == 0 && device == invalidInitialMidiInputValue) return "";
+  return device;
 }
-function validateSelectedDevices() {
-  wrongInputDeviceSelected = isNotesDevice(selectedDevice(0));
-  var wrongDeviceSelected = wrongInputDeviceSelected || isNotesDevice(selectedDevice(1));
-  if (wrongDeviceSelected && !wrongDeviceWarningShown) {
-    wrongDeviceWarningShown = true;
+function validateSelectedDevices(inputDevice, outputDevice) {
+  var inputIsNotes = inputDevice != "" && isNotesDevice(inputDevice);
+  var outputIsNotes = outputDevice != "" && isNotesDevice(outputDevice);
+  wrongInputDeviceSelected = inputIsNotes;
+  if (inputDevice == "" && outputDevice == "") {
+    setDeviceConfigurationWarning("");
+    return false;
+  }
+  if (inputIsNotes || outputIsNotes) {
+    setDeviceConfigurationWarning("notes");
+    return false;
+  }
+  if (inputDevice == "") {
+    setDeviceConfigurationWarning("missingInput");
+    return false;
+  }
+  if (outputDevice == "") {
+    setDeviceConfigurationWarning("missingOutput");
+    return false;
+  }
+  setDeviceConfigurationWarning("");
+  return true;
+}
+function setDeviceConfigurationWarning(problem) {
+  if (problem == currentDeviceConfigurationWarning) return;
+  currentDeviceConfigurationWarning = problem;
+  if (problem == "missingInput") {
     script.logWarning(
-      "Select APC mini mk2 Control for both MIDI input and output. The separate Notes port is not supported."
+      "MIDI input is not selected. Select APC mini mk2 Control for both MIDI input and output."
     );
-  } else if (!wrongDeviceSelected) {
-    wrongDeviceWarningShown = false;
+  } else if (problem == "missingOutput") {
+    script.logWarning(
+      "MIDI output is not selected. Select APC mini mk2 Control for both MIDI input and output."
+    );
+  } else if (problem == "notes") {
+    script.logWarning(
+      "The APC mini mk2 Notes port is not supported. Select APC mini mk2 Control for both MIDI input and output."
+    );
   }
 }
-function isNotesDevice(identifier) {
-  var normalized = identifier.toLowerCase();
-  return normalized.indexOf("apc") >= 0 && normalized.indexOf("notes") >= 0;
+function isNotesDevice(name) {
+  return name.toLowerCase().indexOf("notes") >= 0;
 }
 function sameControl(first, second) {
   return first.is(second);

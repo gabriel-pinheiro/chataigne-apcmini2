@@ -1,4 +1,5 @@
 interface ChataigneScriptTarget {
+  getJSONData(): Record<string, unknown>;
   is(other: ChataigneScriptTarget): boolean;
 }
 

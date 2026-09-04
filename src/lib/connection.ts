@@ -2,13 +2,15 @@ var deviceControls: ChataigneMidiDeviceParameter;
 var connectionControl: ChataigneParameter<boolean>;
 var previousInputDevice = "";
 var wrongInputDeviceSelected = false;
-var wrongDeviceWarningShown = false;
+var currentDeviceConfigurationWarning = "";
+var invalidInitialMidiInputValue = "MIDI Devices to connect to";
 
-// 0 = idle, 1 = scheduled after a device change, 2 = awaiting response.
+// 0 = idle, 1 = waiting for Chataigne's device state to settle,
+// 2 = awaiting an Introduction response.
 var introductionState = 0;
 var introductionStateChangedAt = 0;
-var introductionDelaySeconds = 0.1;
-var introductionTimeoutSeconds = 1;
+var deviceSettleDelaySeconds = 0.1;
+var introductionRetryDelaySeconds = 0.5;
 var introductionAttempts = 0;
 var maximumIntroductionAttempts = 2;
 
@@ -18,7 +20,6 @@ function initializeConnection(): void {
   previousInputDevice = selectedDevice(0);
 
   resetPressedValues();
-  validateSelectedDevices();
   scheduleIntroduction();
 }
 
@@ -65,10 +66,6 @@ function handleModuleParameterChange(parameter: ChataigneParameter<unknown>): vo
     if (!connectionControl.get()) {
       resetPressedValues();
       setPadMode("unknown");
-      introductionState = 0;
-      markControllerOutputInitializing();
-      markMidiClockInitializing();
-      return;
     }
     scheduleIntroduction();
   }
@@ -79,22 +76,22 @@ function updateIntroduction(): void {
 
   var now = util.getTime();
   if (introductionState == 1
-    && now - introductionStateChangedAt >= introductionDelaySeconds) {
-    // The controller may answer synchronously from another MIDI callback. Mark
-    // the request pending before sending so a fast response can clear it.
-    introductionState = 2;
-    introductionStateChangedAt = now;
-    introductionAttempts += 1;
-    logInitializationRequest(introductionAttempts);
-    sendIntroductionRequest();
+    && now - introductionStateChangedAt >= deviceSettleDelaySeconds) {
+    beginIntroductionAfterDeviceSettle(now);
     return;
   }
 
   if (introductionState == 2
-    && now - introductionStateChangedAt >= introductionTimeoutSeconds) {
+    && now - introductionStateChangedAt >= introductionRetryDelaySeconds) {
+    if (introductionAttempts < maximumIntroductionAttempts) {
+      sendIntroductionAttempt(now);
+      return;
+    }
+
     introductionState = 0;
     script.logWarning(
       "APC Mini mkII did not respond to initialization. "
+      + "Verify that APC mini mk2 Control (not Notes) is selected for both MIDI devices. "
       + "Incoming MIDI will continue, but initial fader positions may be unknown."
     );
     completeDeviceInitialization();
@@ -110,22 +107,39 @@ function handleDeviceChange(): void {
   }
 
   previousInputDevice = inputDevice;
-  validateSelectedDevices();
   scheduleIntroduction();
 }
 
 function scheduleIntroduction(): void {
   markControllerOutputInitializing();
   markMidiClockInitializing();
-  if (!connectionControl.get()
-    || selectedDevice(0) == ""
-    || selectedDevice(1) == "") {
-    introductionState = 0;
-    return;
-  }
   introductionAttempts = 0;
   introductionState = 1;
   introductionStateChangedAt = util.getTime();
+}
+
+function beginIntroductionAfterDeviceSettle(now: number): void {
+  var inputDevice = selectedDevice(0);
+  var outputDevice = selectedDevice(1);
+  if (!validateSelectedDevices(inputDevice, outputDevice)
+    || !connectionControl.get()
+    || inputDevice == ""
+    || outputDevice == "") {
+    introductionState = 0;
+    return;
+  }
+
+  sendIntroductionAttempt(now);
+}
+
+function sendIntroductionAttempt(now: number): void {
+  // The controller may answer synchronously from another MIDI callback. Mark
+  // the request pending before sending so a fast response can clear it.
+  introductionState = 2;
+  introductionStateChangedAt = now;
+  introductionAttempts += 1;
+  logInitializationRequest(introductionAttempts);
+  sendIntroductionRequest();
 }
 
 function completeDeviceInitialization(): void {
@@ -144,27 +158,64 @@ function isAmbiguousFaderSnapshot(values: number[]): boolean {
 function selectedDevice(index: number): string {
   var devices = deviceControls.get();
   if (!devices || devices.length <= index || !devices[index]) return "";
-  return devices[index];
+  var device = "" + devices[index];
+  if (index == 0 && device == invalidInitialMidiInputValue) return "";
+  return device;
 }
 
-function validateSelectedDevices(): void {
-  wrongInputDeviceSelected = isNotesDevice(selectedDevice(0));
-  var wrongDeviceSelected = wrongInputDeviceSelected || isNotesDevice(selectedDevice(1));
+function validateSelectedDevices(
+  inputDevice: string,
+  outputDevice: string
+): boolean {
+  // Some platforms include a descriptive name in the raw ID. Chataigne does
+  // not expose the selected display names reliably to scripts, so this check
+  // is intentionally opportunistic.
+  var inputIsNotes = inputDevice != "" && isNotesDevice(inputDevice);
+  var outputIsNotes = outputDevice != "" && isNotesDevice(outputDevice);
+  wrongInputDeviceSelected = inputIsNotes;
 
-  if (wrongDeviceSelected && !wrongDeviceWarningShown) {
-    wrongDeviceWarningShown = true;
+  if (inputDevice == "" && outputDevice == "") {
+    setDeviceConfigurationWarning("");
+    return false;
+  }
+  if (inputIsNotes || outputIsNotes) {
+    setDeviceConfigurationWarning("notes");
+    return false;
+  }
+  if (inputDevice == "") {
+    setDeviceConfigurationWarning("missingInput");
+    return false;
+  }
+  if (outputDevice == "") {
+    setDeviceConfigurationWarning("missingOutput");
+    return false;
+  }
+  setDeviceConfigurationWarning("");
+  return true;
+}
+
+function setDeviceConfigurationWarning(problem: string): void {
+  if (problem == currentDeviceConfigurationWarning) return;
+  currentDeviceConfigurationWarning = problem;
+
+  if (problem == "missingInput") {
     script.logWarning(
-      "Select APC mini mk2 Control for both MIDI input and output. "
-      + "The separate Notes port is not supported."
+      "MIDI input is not selected. Select APC mini mk2 Control for both MIDI input and output."
     );
-  } else if (!wrongDeviceSelected) {
-    wrongDeviceWarningShown = false;
+  } else if (problem == "missingOutput") {
+    script.logWarning(
+      "MIDI output is not selected. Select APC mini mk2 Control for both MIDI input and output."
+    );
+  } else if (problem == "notes") {
+    script.logWarning(
+      "The APC mini mk2 Notes port is not supported. "
+      + "Select APC mini mk2 Control for both MIDI input and output."
+    );
   }
 }
 
-function isNotesDevice(identifier: string): boolean {
-  var normalized = identifier.toLowerCase();
-  return normalized.indexOf("apc") >= 0 && normalized.indexOf("notes") >= 0;
+function isNotesDevice(name: string): boolean {
+  return name.toLowerCase().indexOf("notes") >= 0;
 }
 
 function sameControl(
