@@ -147,9 +147,26 @@ function logPalettePadLedOutput(
   );
 }
 
-function logPadLedDisabled(note: number): void {
+function logPadLedOff(note: number): void {
   if (!interpretedOutputLogControl.get()) return;
+  if (isBlackoutActive()) {
+    script.log("Pad LED Blacked Out: " + padLabel(note));
+    return;
+  }
   script.log("Pad LED Disabled: " + padLabel(note));
+}
+
+function logGeneralLedOutputChange(parameter: ChataigneParameter<unknown>): void {
+  if (!interpretedOutputLogControl.get()) return;
+  if (parameter.is(local.parameters.general.blackout)) {
+    script.log("Blackout " + (isBlackoutActive() ? "Enabled" : "Disabled"));
+  } else {
+    script.log(
+      "Pad Brightness Changed: "
+      + (local.parameters.general.padBrightness.get() == "dim" ? "Dim" : "Full")
+      + " (" + Math.round(padBrightnessMultiplier() * 100) + "%)"
+    );
+  }
 }
 
 function logButtonLedOutput(note: number, modeLabel: string): void {

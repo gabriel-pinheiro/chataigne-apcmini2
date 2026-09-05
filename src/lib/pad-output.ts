@@ -64,13 +64,13 @@ function handlePadOutputParameterChange(parameter: ChataigneParameter<unknown>):
 
 function sendPadLedUpdate(note: number): void {
   var ledEnabled = padLedEnabledControls[note].get();
-  if (!ledEnabled) {
+  if (!padLedOutputEnabled(ledEnabled)) {
     sendHardwarePalettePad(note, 0, "solid100");
-    logPadLedDisabled(note);
+    logPadLedOff(note);
     return;
   }
 
-  var requestedRgb = effectiveColorRgb(padColorControls[note].get());
+  var requestedRgb = effectivePadColorRgb(padColorControls[note].get());
   if (padColorModeControls[note].get() == "palette") {
     var paletteIndex = nearestHardwarePaletteIndex(requestedRgb);
     var selectedRgb = hardwarePaletteRgb(paletteIndex);
@@ -103,12 +103,12 @@ function sendFullPadResync(): void {
 }
 
 function appendPadToFullResync(note: number, controls: ChataignePadParameters): void {
-  if (!controls.ledEnabled.get()) {
+  if (!padLedOutputEnabled(controls.ledEnabled.get())) {
     sendHardwarePalettePad(note, 0, "solid100");
     return;
   }
 
-  var requestedRgb = effectiveColorRgb(controls.color.get());
+  var requestedRgb = effectivePadColorRgb(controls.color.get());
   if (controls.colorMode.get() == "palette") {
     sendHardwarePalettePad(
       note,
@@ -157,17 +157,28 @@ function appendSevenBitPair(message: number[], value: number): void {
   message.push((value >> 7) & 0x7f, value & 0x7f);
 }
 
-function effectiveColorRgb(color: [number, number, number, number]): number[] {
-  var alpha = clampNormalized(color[3]);
+function padLedOutputEnabled(ledEnabled: boolean): boolean {
+  return ledEnabled && !isBlackoutActive();
+}
+
+function effectivePadColorRgb(color: [number, number, number, number]): number[] {
+  return effectiveColorRgb(color, padBrightnessMultiplier());
+}
+
+function effectiveColorRgb(
+  color: [number, number, number, number],
+  brightness: number
+): number[] {
+  var multiplier = clampNormalized(color[3]) * clampNormalized(brightness);
   return [
-    normalizedColorByte(color[0], alpha),
-    normalizedColorByte(color[1], alpha),
-    normalizedColorByte(color[2], alpha)
+    normalizedColorByte(color[0], multiplier),
+    normalizedColorByte(color[1], multiplier),
+    normalizedColorByte(color[2], multiplier)
   ];
 }
 
-function normalizedColorByte(component: number, alpha: number): number {
-  return Math.round(clampNormalized(component) * alpha * 255);
+function normalizedColorByte(component: number, multiplier: number): number {
+  return Math.round(clampNormalized(component) * multiplier * 255);
 }
 
 function clampNormalized(value: number): number {

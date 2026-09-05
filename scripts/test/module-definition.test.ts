@@ -79,6 +79,15 @@ test("exposes opt-in interpreted logging controls", () => {
   assert.equal(output.default, false);
 });
 
+test("exposes Full and Dim pad brightness with Full as the saved default", () => {
+  const controls = collectByShortName(moduleDefinition.parameters, "padBrightness");
+  assert.equal(controls.length, 1);
+  assert.equal(controls[0].type, "Enum");
+  assert.equal(controls[0].default, "Full");
+  assert.deepEqual(controls[0].options, { Full: "full", Dim: "dim" });
+  assert.equal(collectByShortName(moduleDefinition.parameters, "masterBrightness").length, 0);
+});
+
 test("exposes a stable Full Resync command", () => {
   const commands = moduleDefinition.commands;
   assert.ok(commands !== null && !Array.isArray(commands) && typeof commands === "object");

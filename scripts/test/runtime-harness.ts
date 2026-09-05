@@ -26,7 +26,7 @@ export type RuntimeFunctions = {
   decodeIntroductionFaders(data: number[]): number[];
   nearestHardwarePaletteIndex(rgb: number[]): number;
   hardwarePaletteRgb(index: number): number[];
-  effectiveColorRgb(color: [number, number, number, number]): number[];
+  effectiveColorRgb(color: [number, number, number, number], brightness: number): number[];
   padLabel(note: number): string;
   formatMidiValue(value: number): string;
 };
@@ -81,6 +81,8 @@ type RuntimeOptions = {
   bpm?: number;
   inheritedSendClock?: boolean;
   inheritedBpm?: number;
+  blackout?: boolean;
+  padBrightness?: "full" | "dim";
 };
 
 export async function createRuntime(options: RuntimeOptions = {}) {
@@ -107,6 +109,8 @@ export async function createRuntime(options: RuntimeOptions = {}) {
   const bpm = parameter(options.bpm ?? 120);
   const midiSendClock = parameter(options.inheritedSendClock ?? false);
   const midiBpm = parameter(options.inheritedBpm ?? 0);
+  const blackout = parameter(options.blackout ?? false);
+  const padBrightness = parameter<string>(options.padBrightness ?? "full");
 
   type PressedControl = MockContainer<{ isPressed: MockParameter<boolean> }>;
   type PadRow = MockContainer<Record<string, PressedControl>>;
@@ -173,6 +177,7 @@ export async function createRuntime(options: RuntimeOptions = {}) {
   const parameters = container({
     devices,
     isConnected,
+    general: container({ blackout, padBrightness }),
     clock: container({ sendClock, bpm }),
     logging: container({ logInterpretedInput, logInterpretedOutput }),
     pads: container(padParameters),
@@ -233,6 +238,8 @@ export async function createRuntime(options: RuntimeOptions = {}) {
     runtime,
     devices,
     isConnected,
+    blackout,
+    padBrightness,
     padMode,
     pads,
     padParameters,

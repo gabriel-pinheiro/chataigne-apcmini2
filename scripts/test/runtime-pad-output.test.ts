@@ -39,7 +39,10 @@ async function createReadyRuntime(logInterpretedOutput = false) {
 test("matches effective colors against the official palette with stable ties", async () => {
   const { runtime } = await createRuntime();
 
-  assert.deepEqual(Array.from(runtime.effectiveColorRgb([1, 0.5, 0.25, 0.5])), [128, 64, 32]);
+  assert.deepEqual(Array.from(runtime.effectiveColorRgb([1, 0.5, 0.25, 0.5], 1)), [128, 64, 32]);
+  // The internal calculation retains arbitrary multipliers, including zero.
+  assert.deepEqual(Array.from(runtime.effectiveColorRgb([1, 0.5, 0.25, 0.5], 0.3)), [38, 19, 10]);
+  assert.deepEqual(Array.from(runtime.effectiveColorRgb([1, 0.5, 0.25, 0.5], 0)), [0, 0, 0]);
   assert.equal(runtime.nearestHardwarePaletteIndex([0, 0, 0]), 0);
   assert.equal(runtime.nearestHardwarePaletteIndex([255, 0, 0]), 5);
   assert.equal(runtime.nearestHardwarePaletteIndex([0, 255, 0]), 21);
@@ -119,7 +122,7 @@ test("renders every native Hardware Palette brightness, pulse, and blink mode", 
   );
 
   const green = [0, 1, 0, 0.5] as [number, number, number, number];
-  const effectiveGreen = Array.from(runtime.effectiveColorRgb(green));
+  const effectiveGreen = Array.from(runtime.effectiveColorRgb(green, 1));
   const greenIndex = runtime.nearestHardwarePaletteIndex(effectiveGreen);
   pad.color.set(green);
   runtime.moduleParameterChanged(pad.color);

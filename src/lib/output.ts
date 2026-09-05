@@ -8,8 +8,26 @@ function initializeControllerOutput(): void {
 function handleControllerOutputParameterChange(
   parameter: ChataigneParameter<unknown>
 ): void {
+  if (parameter.is(local.parameters.general.blackout)
+    || parameter.is(local.parameters.general.padBrightness)) {
+    if (controllerOutputReady && isControllerOutputConnected()) {
+      logGeneralLedOutputChange(parameter);
+      sendFullControllerResync();
+    }
+    return;
+  }
+
   handlePadOutputParameterChange(parameter);
   handleButtonOutputParameterChange(parameter);
+}
+
+function isBlackoutActive(): boolean {
+  return local.parameters.general.blackout.get();
+}
+
+function padBrightnessMultiplier(): number {
+  if (local.parameters.general.padBrightness.get() == "dim") return 0.4;
+  return 1;
 }
 
 function markControllerOutputInitializing(): void {

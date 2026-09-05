@@ -32,8 +32,27 @@ these settings.
 
 All 64 pad LEDs support Exact RGB and Hardware Palette output. Changes are sent
 immediately after the controller has initialized. A color's alpha is multiplied
-into its red, green, and blue components before output; Hardware Palette then
-selects the nearest of the controller's 128 native colors.
+into its red, green, and blue components together with the Pad Brightness
+multiplier before rounding to 8-bit RGB; Hardware Palette then selects the
+nearest of the controller's 128 native colors.
+
+`Parameters > General` contains two saved, module-wide controls:
+
+- **Blackout** defaults to off. Turning it on forces all 64 pad LEDs and all
+  16 Track/Scene LEDs off without modifying their individual settings. Colors,
+  enabled states, button modes, and Pad Brightness remain editable during
+  blackout; turning it off renders their latest settings.
+- **Pad Brightness** offers **Full** (the default, multiplier `1`) and **Dim**
+  (multiplier `0.4`). Dim multiplies pad RGB by 40% in addition to color alpha.
+  It does not affect Track/Scene LEDs. Hardware Palette matching happens after
+  this multiplication, while the selected Palette Mode remains unchanged and
+  still applies its native brightness or animation.
+
+Changing either control immediately resends the complete LED state once the
+controller is ready. This LED resync does not request Introduction, refresh
+faders, or restart MIDI Clock. Initialization, reconnects, manual Full Resync,
+and returning to Session Mode all respect the current overrides. Both controls
+have the same Session Mode support boundary as the rest of the module.
 
 Hardware Palette supports all native LED behaviors: seven solid brightness
 levels, four pulse rates, and five blink rates. Pulse and blink subdivisions
@@ -62,6 +81,8 @@ Chataigne exposes `Full Resync` in command and consequence choosers, not in the
 module inspector. After updating this module's `module.json`, use
 `File > Reload Custom Modules` and recreate the module instance, or restart
 Chataigne, so it rebuilds the cached command definition.
+The same reload requirement applies when adding new parameters such as General;
+reloading only the script does not create the new controls.
 
 Hardware behavior and MIDI mappings are based on Akai's
 [user guide](https://cdn.inmusicbrands.com/akai/apc-mini-mkii/APC%20mini%20mk2%20-%20User%20Guide%20-%20v1.7.pdf)

@@ -439,9 +439,23 @@ function logPalettePadLedOutput(note, paletteIndex, selectedRgb, requestedRgb, p
     "Pad LED Updated: " + padLabel(note) + " = Palette " + paletteIndex + " " + formatRgbHex(selectedRgb) + ", " + paletteModeLabel + " (requested " + formatRgbHex(requestedRgb) + ")"
   );
 }
-function logPadLedDisabled(note) {
+function logPadLedOff(note) {
   if (!interpretedOutputLogControl.get()) return;
+  if (isBlackoutActive()) {
+    script.log("Pad LED Blacked Out: " + padLabel(note));
+    return;
+  }
   script.log("Pad LED Disabled: " + padLabel(note));
+}
+function logGeneralLedOutputChange(parameter) {
+  if (!interpretedOutputLogControl.get()) return;
+  if (parameter.is(local.parameters.general.blackout)) {
+    script.log("Blackout " + (isBlackoutActive() ? "Enabled" : "Disabled"));
+  } else {
+    script.log(
+      "Pad Brightness Changed: " + (local.parameters.general.padBrightness.get() == "dim" ? "Dim" : "Full") + " (" + Math.round(padBrightnessMultiplier() * 100) + "%)"
+    );
+  }
 }
 function logButtonLedOutput(note, modeLabel) {
   if (!interpretedOutputLogControl.get()) return;
@@ -836,12 +850,12 @@ function handlePadOutputParameterChange(parameter) {
 }
 function sendPadLedUpdate(note) {
   var ledEnabled = padLedEnabledControls[note].get();
-  if (!ledEnabled) {
+  if (!padLedOutputEnabled(ledEnabled)) {
     sendHardwarePalettePad(note, 0, "solid100");
-    logPadLedDisabled(note);
+    logPadLedOff(note);
     return;
   }
-  var requestedRgb = effectiveColorRgb(padColorControls[note].get());
+  var requestedRgb = effectivePadColorRgb(padColorControls[note].get());
   if (padColorModeControls[note].get() == "palette") {
     var paletteIndex = nearestHardwarePaletteIndex(requestedRgb);
     var selectedRgb = hardwarePaletteRgb(paletteIndex);
@@ -870,11 +884,11 @@ function sendFullPadResync() {
   }
 }
 function appendPadToFullResync(note, controls) {
-  if (!controls.ledEnabled.get()) {
+  if (!padLedOutputEnabled(controls.ledEnabled.get())) {
     sendHardwarePalettePad(note, 0, "solid100");
     return;
   }
-  var requestedRgb = effectiveColorRgb(controls.color.get());
+  var requestedRgb = effectivePadColorRgb(controls.color.get());
   if (controls.colorMode.get() == "palette") {
     sendHardwarePalettePad(
       note,
@@ -912,16 +926,22 @@ function appendExactRgbPadRecord(message, note, rgb) {
 function appendSevenBitPair(message, value) {
   message.push(value >> 7 & 127, value & 127);
 }
-function effectiveColorRgb(color) {
-  var alpha = clampNormalized(color[3]);
+function padLedOutputEnabled(ledEnabled) {
+  return ledEnabled && !isBlackoutActive();
+}
+function effectivePadColorRgb(color) {
+  return effectiveColorRgb(color, padBrightnessMultiplier());
+}
+function effectiveColorRgb(color, brightness) {
+  var multiplier = clampNormalized(color[3]) * clampNormalized(brightness);
   return [
-    normalizedColorByte(color[0], alpha),
-    normalizedColorByte(color[1], alpha),
-    normalizedColorByte(color[2], alpha)
+    normalizedColorByte(color[0], multiplier),
+    normalizedColorByte(color[1], multiplier),
+    normalizedColorByte(color[2], multiplier)
   ];
 }
-function normalizedColorByte(component, alpha) {
-  return Math.round(clampNormalized(component) * alpha * 255);
+function normalizedColorByte(component, multiplier) {
+  return Math.round(clampNormalized(component) * multiplier * 255);
 }
 function clampNormalized(value) {
   return Math.max(0, Math.min(1, value));
@@ -978,13 +998,21 @@ function handleButtonOutputParameterChange(parameter) {
 function sendButtonLedUpdate(note) {
   var mode = buttonLedModeControls[note].get();
   sendButtonLed(note, mode);
-  logButtonLedOutput(note, buttonLedModeLabel(mode));
+  logButtonLedOutput(note, buttonLedModeLabel(effectiveButtonLedMode(mode)));
 }
 function sendFullButtonResync() {
   visitButtonLedControls(resyncButtonLedOperation);
 }
 function sendButtonLed(note, mode) {
-  local.sendNoteOn(peripheralLedMidiChannel, note, buttonLedModeVelocity(mode));
+  local.sendNoteOn(
+    peripheralLedMidiChannel,
+    note,
+    buttonLedModeVelocity(effectiveButtonLedMode(mode))
+  );
+}
+function effectiveButtonLedMode(mode) {
+  if (isBlackoutActive()) return "off";
+  return mode;
 }
 function buttonLedModeVelocity(mode) {
   if (mode == "on") return 1;
@@ -1002,8 +1030,22 @@ function initializeControllerOutput() {
   initializeButtonOutput();
 }
 function handleControllerOutputParameterChange(parameter) {
+  if (parameter.is(local.parameters.general.blackout) || parameter.is(local.parameters.general.padBrightness)) {
+    if (controllerOutputReady && isControllerOutputConnected()) {
+      logGeneralLedOutputChange(parameter);
+      sendFullControllerResync();
+    }
+    return;
+  }
   handlePadOutputParameterChange(parameter);
   handleButtonOutputParameterChange(parameter);
+}
+function isBlackoutActive() {
+  return local.parameters.general.blackout.get();
+}
+function padBrightnessMultiplier() {
+  if (local.parameters.general.padBrightness.get() == "dim") return 0.4;
+  return 1;
 }
 function markControllerOutputInitializing() {
   controllerOutputReady = false;

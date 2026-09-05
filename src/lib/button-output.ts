@@ -45,7 +45,7 @@ function handleButtonOutputParameterChange(
 function sendButtonLedUpdate(note: number): void {
   var mode = buttonLedModeControls[note].get();
   sendButtonLed(note, mode);
-  logButtonLedOutput(note, buttonLedModeLabel(mode));
+  logButtonLedOutput(note, buttonLedModeLabel(effectiveButtonLedMode(mode)));
 }
 
 function sendFullButtonResync(): void {
@@ -53,7 +53,16 @@ function sendFullButtonResync(): void {
 }
 
 function sendButtonLed(note: number, mode: string): void {
-  local.sendNoteOn(peripheralLedMidiChannel, note, buttonLedModeVelocity(mode));
+  local.sendNoteOn(
+    peripheralLedMidiChannel,
+    note,
+    buttonLedModeVelocity(effectiveButtonLedMode(mode))
+  );
+}
+
+function effectiveButtonLedMode(mode: string): string {
+  if (isBlackoutActive()) return "off";
+  return mode;
 }
 
 function buttonLedModeVelocity(mode: string): number {

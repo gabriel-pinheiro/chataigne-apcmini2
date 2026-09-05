@@ -105,6 +105,10 @@ interface ChataigneLocal {
   parameters: {
     devices: ChataigneMidiDeviceParameter;
     isConnected: ChataigneParameter<boolean>;
+    general: {
+      blackout: ChataigneParameter<boolean>;
+      padBrightness: ChataigneEnumParameter;
+    };
     clock: ChataigneClockControls;
     logging: {
       logInterpretedInput: ChataigneParameter<boolean>;

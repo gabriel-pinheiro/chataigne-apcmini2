@@ -28,6 +28,26 @@
     }
   },
   "parameters": {
+    "General": {
+      "type": "Container",
+      "collapsed": false,
+      "Blackout": {
+        "type": "Boolean",
+        "shortName": "blackout",
+        "default": false,
+        "description": "Force all pad and Track/Scene LEDs off without changing their saved settings. Supported in Session Mode."
+      },
+      "Pad Brightness": {
+        "type": "Enum",
+        "shortName": "padBrightness",
+        "default": "Full",
+        "options": {
+          "Full": "full",
+          "Dim": "dim"
+        },
+        "description": "Full uses 100% and Dim uses 40%. Does not affect Track/Scene LEDs."
+      }
+    },
     "Clock": {
       "type": "Container",
       "collapsed": false,
