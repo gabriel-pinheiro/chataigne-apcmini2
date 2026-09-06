@@ -1,2 +1,4 @@
 node_modules/
 research/
+*.noisette
+*_autosave/

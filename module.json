@@ -2,8 +2,10 @@
   "name": "APC Mini mkII Enhanced",
   "type": "MIDI",
   "path": "Hardware",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Enhanced Chataigne support for the Akai APC Mini mkII control surface.",
+  "url": "https://github.com/gabriel-pinheiro/chataigne-apcmini2",
+  "downloadURL": "https://github.com/gabriel-pinheiro/chataigne-apcmini2/archive/main.zip",
   "hasInput": true,
   "hasOutput": true,
   "hideDefaultCommands": true,
@@ -4358,7 +4360,7 @@
           "Session": "session",
           "Note": "note",
           "Drum": "drum",
-          "Note Edit": "node_edit"
+          "Note Edit": "note_edit"
         },
         "readOnly": true,
         "description": "Currently detected hardware pad mode. Only Session Mode is supported."
