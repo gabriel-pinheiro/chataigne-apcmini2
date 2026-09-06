@@ -40,7 +40,7 @@ test("tracks explicit pad-mode SysEx and warns once per unsupported transition",
 
   runtime.sysExEvent(modeMessage(3));
   runtime.sysExEvent(modeMessage(3));
-  assert.equal(padMode.get(), "node_edit");
+  assert.equal(padMode.get(), "note_edit");
   assert.equal(warnings.length, 3);
   assert.match(warnings[2], /Note Edit Mode is not supported/);
 });

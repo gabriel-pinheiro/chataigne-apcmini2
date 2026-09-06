@@ -1,4 +1,4 @@
-type PadMode = "unknown" | "session" | "note" | "drum" | "node_edit";
+type PadMode = "unknown" | "session" | "note" | "drum" | "note_edit";
 
 // Intentionally use loose numeric equality in runtime code. JUCE parses script
 // integer literals as int64, while Chataigne supplies MIDI values as int vars;
@@ -57,7 +57,7 @@ function decodePadMode(data: number[]): PadMode | "" {
   if (mode == 0) return "session";
   if (mode == 1) return "note";
   if (mode == 2) return "drum";
-  if (mode == 3) return "node_edit";
+  if (mode == 3) return "note_edit";
   return "";
 }
 
@@ -74,7 +74,7 @@ function decodeIntroductionFaders(data: number[]): number[] {
 }
 
 function sendIntroductionRequest(): void {
-  // Application/configuration 0, module version 0.1.0.
+  // Application/configuration 0, module version 1.0.0.
   local.sendSysex(
     akaiManufacturerId,
     0x7f,
@@ -83,8 +83,8 @@ function sendIntroductionRequest(): void {
     0x00,
     0x04,
     0x00,
-    0x00,
     0x01,
+    0x00,
     0x00
   );
 }

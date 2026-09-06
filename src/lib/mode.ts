@@ -26,7 +26,7 @@ function setPadMode(mode: PadMode): boolean {
     script.logWarning(
       "Note Mode is not supported. Press Shift + Scene 7 to return to Session Mode."
     );
-  } else if (mode == "node_edit") {
+  } else if (mode == "note_edit") {
     script.logWarning(
       "Note Edit Mode is not supported. Press Shift + Scene 7 to return to Session Mode."
     );

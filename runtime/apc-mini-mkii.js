@@ -35,7 +35,7 @@ function decodePadMode(data) {
   if (mode == 0) return "session";
   if (mode == 1) return "note";
   if (mode == 2) return "drum";
-  if (mode == 3) return "node_edit";
+  if (mode == 3) return "note_edit";
   return "";
 }
 function decodeIntroductionFaders(data) {
@@ -57,8 +57,8 @@ function sendIntroductionRequest() {
     0,
     4,
     0,
-    0,
     1,
+    0,
     0
   );
 }
@@ -517,7 +517,7 @@ function padModeLabel(mode) {
   if (mode == "session") return "Session";
   if (mode == "note") return "Note";
   if (mode == "drum") return "Drum";
-  if (mode == "node_edit") return "Note Edit";
+  if (mode == "note_edit") return "Note Edit";
   return "Unknown";
 }
 function formatMidiValue(value) {
@@ -1096,7 +1096,7 @@ function setPadMode(mode) {
     script.logWarning(
       "Note Mode is not supported. Press Shift + Scene 7 to return to Session Mode."
     );
-  } else if (mode == "node_edit") {
+  } else if (mode == "note_edit") {
     script.logWarning(
       "Note Edit Mode is not supported. Press Shift + Scene 7 to return to Session Mode."
     );

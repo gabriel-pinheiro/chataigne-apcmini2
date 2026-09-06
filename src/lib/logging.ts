@@ -241,7 +241,7 @@ function padModeLabel(mode: PadMode): string {
   if (mode == "session") return "Session";
   if (mode == "note") return "Note";
   if (mode == "drum") return "Drum";
-  if (mode == "node_edit") return "Note Edit";
+  if (mode == "note_edit") return "Note Edit";
   return "Unknown";
 }
 
